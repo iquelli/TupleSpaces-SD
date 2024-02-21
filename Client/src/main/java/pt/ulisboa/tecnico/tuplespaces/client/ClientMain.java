@@ -3,6 +3,7 @@ package pt.ulisboa.tecnico.tuplespaces.client;
 import pt.ulisboa.tecnico.tuplespaces.client.grpc.ClientService;
 
 public class ClientMain {
+
     public static void main(String[] args) {
 
         System.out.println(ClientMain.class.getSimpleName());
@@ -28,4 +29,5 @@ public class ClientMain {
         parser.parseInput();
 
     }
+
 }
