@@ -49,6 +49,23 @@ To compile and install all modules:
 mvn clean install
 ```
 
+### Formatting
+
+We used [Spotless](https://github.com/diffplug/spotless) in this project to ensure code
+formatting rules are followed.
+
+It is possible to check if the code adheres to the formatting rules by running:
+
+```s
+mvn spotless:check
+```
+
+Or, alternatively, actually format the code:
+
+```s
+mvn spotless:apply
+```
+
 ## Built With
 
 * [Maven](https://maven.apache.org/) - Build and dependency management tool;

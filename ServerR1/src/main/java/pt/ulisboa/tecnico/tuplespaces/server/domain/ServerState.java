@@ -5,7 +5,7 @@ import java.util.List;
 
 public class ServerState {
 
-    private final List<String> tuples;
+    private List<String> tuples;
 
     public ServerState() {
         this.tuples = new ArrayList<String>();

@@ -36,31 +36,24 @@ public class CommandProcessor {
                 case PUT:
                     this.put(split);
                     break;
-
                 case READ:
                     this.read(split);
                     break;
-
                 case TAKE:
                     this.take(split);
                     break;
-
                 case GET_TUPLE_SPACES_STATE:
                     this.getTupleSpacesState(split);
                     break;
-
                 case SLEEP:
                     this.sleep(split);
                     break;
-
                 case SET_DELAY:
                     this.setdelay(split);
                     break;
-
                 case EXIT:
                     exit = true;
                     break;
-
                 default:
                     this.printUsage();
                     break;
@@ -161,28 +154,25 @@ public class CommandProcessor {
         }
 
         // register delay <time> for when calling server <qualifier>
-        System.out.println("TODO: implement setdelay command (only needed in phases 2+3)");
+        System.out.println(
+                "TODO: implement setdelay command (only needed in phases 2+3)"
+        );
     }
 
     private void printUsage() {
-        System.out.println("Usage:\n" +
-                "- put <element[,more_elements]>\n" +
-                "- read <element[,more_elements]>\n" +
-                "- take <element[,more_elements]>\n" +
-                "- getTupleSpacesState <server>\n" +
-                "- sleep <integer>\n" +
-                "- setdelay <server> <integer>\n" +
-                "- exit\n");
+        System.out.println(
+                "Usage:\n" + "- put <element[,more_elements]>\n" +
+                        "- read <element[,more_elements]>\n" +
+                        "- take <element[,more_elements]>\n" +
+                        "- getTupleSpacesState <server>\n" +
+                        "- sleep <integer>\n" +
+                        "- setdelay <server> <integer>\n" + "- exit\n"
+        );
     }
 
     private boolean inputIsValid(String[] input) {
-        if (input.length < 2
-                ||
-                !input[1].startsWith(BGN_TUPLE)
-                ||
-                !input[1].endsWith(END_TUPLE)
-                ||
-                input.length > 2
+        if (input.length < 2 || !input[1].startsWith(BGN_TUPLE) || !input[1]
+                .endsWith(END_TUPLE) || input.length > 2
         ) {
             this.printUsage();
             return false;

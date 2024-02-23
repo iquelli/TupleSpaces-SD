@@ -1,8 +1,14 @@
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xmlns="http://maven.apache.org/POM/4.0.0"
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <!-- http://maven.apache.org/pom.html#Quick_Overview -->
+
+    <parent>
+        <groupId>pt.tecnico.sdis.2024.A06</groupId>
+        <artifactId>TupleSpaces</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
 
     <groupId>pt.tecnico.sdis.2024.A06</groupId>
     <artifactId>Client</artifactId>
@@ -25,6 +31,7 @@
         <server.port>5001</server.port>
         <server.service>TupleSpaces</server.service>
 
+        <spotless.java.eclipse.file>${project.basedir}${file.separator}..${file.separator}formatter-config.xml</spotless.java.eclipse.file>
     </properties>
 
     <!-- Dependencies are code archives - JARs -
@@ -60,13 +67,6 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>${version.exec-maven-plugin}</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>java</goal>
-                        </goals>
-                    </execution>
-                </executions>
                 <configuration>
                     <mainClass>${mainclass}</mainClass>
                     <arguments>
@@ -75,6 +75,13 @@
                         <argument>${server.service}</argument>
                     </arguments>
                 </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
