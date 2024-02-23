@@ -1,7 +1,6 @@
 syntax = "proto3";
 package pt.ulisboa.tecnico.tuplespaces.centralized.contract;
 
-
 message PutRequest {
   string newTuple = 1;
 }
@@ -22,7 +21,8 @@ message TakeResponse {
   string result = 1;
 }
 
-message getTupleSpacesStateRequest {}
+message getTupleSpacesStateRequest {
+}
 message getTupleSpacesStateResponse {
   repeated string tuple = 1;
 }
