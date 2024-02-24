@@ -2,13 +2,12 @@ package pt.ulisboa.tecnico.tuplespaces.client.grpc;
 
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import io.grpc.StatusRuntimeException;
 import pt.ulisboa.tecnico.tuplespaces.centralized.contract.TupleSpacesGrpc;
-
-/*
- * TODO: The gRPC client-side logic should be here.
- * This should include a method that builds a channel and stub,
- * as well as individual methods for each remote operation of this service.
- */
+import pt.ulisboa.tecnico.tuplespaces.centralized.contract.TupleSpacesCentralized.PutRequest;
+import pt.ulisboa.tecnico.tuplespaces.centralized.contract.TupleSpacesCentralized.ReadRequest;
+import pt.ulisboa.tecnico.tuplespaces.centralized.contract.TupleSpacesCentralized.TakeRequest;
+import pt.ulisboa.tecnico.tuplespaces.centralized.contract.TupleSpacesCentralized.getTupleSpacesStateRequest;
 
 public class ClientService extends TupleSpacesGrpc.TupleSpacesImplBase implements AutoCloseable {
 
@@ -22,20 +21,21 @@ public class ClientService extends TupleSpacesGrpc.TupleSpacesImplBase implement
         stub = TupleSpacesGrpc.newBlockingStub(channel);
     }
 
-    public void put(String[] split) {
-        // TODO
+    public void put(String newTuple) throws StatusRuntimeException {
+        stub.put(PutRequest.newBuilder().setNewTuple(newTuple).build());
     }
 
-    public void read(String[] split) {
-        // TODO
+    public void read(String searchPattern) throws StatusRuntimeException {
+        stub.read(ReadRequest.newBuilder().setSearchPattern(searchPattern).build());
     }
 
-    public void take(String[] split) {
-        // TODO
+    public void take(String searchPattern) throws StatusRuntimeException {
+        stub.take(TakeRequest.newBuilder().setSearchPattern(searchPattern).build());
     }
 
-    public void getTupleSpacesState(String[] split) {
-        // TODO
+    public void getTupleSpacesState(String qualifier) throws StatusRuntimeException {
+        // TODO IMPLEMENT - need name server logic to implement qualifier
+        stub.getTupleSpacesState(getTupleSpacesStateRequest.newBuilder().build());
     }
 
     @Override
