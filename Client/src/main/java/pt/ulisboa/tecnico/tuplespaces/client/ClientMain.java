@@ -27,8 +27,11 @@ public class ClientMain {
         final String host = args[0];
         final String port = args[1];
 
-        CommandProcessor parser = new CommandProcessor(new ClientService());
-        parser.parseInput();
+        // named servers not implemented yet
+        try (var clientService = new ClientService(host, port)) {
+            CommandProcessor parser = new CommandProcessor(clientService);
+            parser.parseInput();
+        }
 
     }
 
