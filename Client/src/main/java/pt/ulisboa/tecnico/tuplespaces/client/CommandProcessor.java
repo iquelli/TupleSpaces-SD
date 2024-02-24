@@ -1,10 +1,11 @@
 package pt.ulisboa.tecnico.tuplespaces.client;
 
+import io.grpc.StatusRuntimeException;
 import pt.ulisboa.tecnico.tuplespaces.client.grpc.ClientService;
 
 import java.util.Scanner;
 
-// TODO add logs for server errors and OK's
+import com.google.protobuf.ProtocolStringList;
 
 public class CommandProcessor {
 
@@ -34,34 +35,50 @@ public class CommandProcessor {
             System.out.print("> ");
             String line = scanner.nextLine().trim();
             String[] split = line.split(SPACE);
-            switch (split[0]) {
-                case PUT:
-                    this.put(split);
-                    break;
-                case READ:
-                    this.read(split);
-                    break;
-                case TAKE:
-                    this.take(split);
-                    break;
-                case GET_TUPLE_SPACES_STATE:
-                    this.getTupleSpacesState(split);
-                    break;
-                case SLEEP:
-                    this.sleep(split);
-                    break;
-                case SET_DELAY:
-                    this.setdelay(split);
-                    break;
-                case EXIT:
-                    exit = true;
-                    break;
-                default:
-                    this.printUsage();
-                    break;
+
+            try {
+
+
+                switch (split[0]) {
+                    case PUT:
+                        this.put(split);
+                        break;
+                    case READ:
+                        this.read(split);
+                        break;
+                    case TAKE:
+                        this.take(split);
+                        break;
+                    case GET_TUPLE_SPACES_STATE:
+                        this.getTupleSpacesState(split);
+                        break;
+                    case SLEEP:
+                        this.sleep(split);
+                        break;
+                    case SET_DELAY:
+                        this.setdelay(split);
+                        break;
+                    case EXIT:
+                        exit = true;
+                        break;
+                    default:
+                        this.printUsage();
+                        break;
+                }
+            } catch (StatusRuntimeException e) {
+                if (e.getStatus().getDescription() != null) {
+                    System.err.println(
+                            "gRCP Error: " + e.getStatus().getDescription()
+                    );
+                } else {
+                    System.err.println("gRCP Error: " + e.getMessage());
+                }
+            } catch (Exception e) {
+                System.err.println("An unexpected error occurred: " + e.getMessage());
             }
         }
     }
+
 
     private void put(String[] split) {
         // check if input is valid
@@ -75,6 +92,7 @@ public class CommandProcessor {
 
         // put the tuple
         clientService.put(tuple);
+        System.out.println("Ok");
     }
 
     private void read(String[] split) {
@@ -88,7 +106,9 @@ public class CommandProcessor {
         String tuple = split[1];
 
         // read the tuple
-        clientService.read(tuple);
+        String responseTuple = clientService.read(tuple);
+        System.out.println("Ok");
+        System.out.println(responseTuple);
     }
 
 
@@ -103,7 +123,9 @@ public class CommandProcessor {
         String tuple = split[1];
 
         // take the tuple
-        clientService.take(tuple);
+        String responseTuple = clientService.take(tuple);
+        System.out.println("Ok");
+        System.out.println(responseTuple);
     }
 
     private void getTupleSpacesState(String[] split) {
@@ -114,7 +136,11 @@ public class CommandProcessor {
         String qualifier = split[1];
 
         // get the tuple spaces state
-        clientService.getTupleSpacesState(qualifier);
+        ProtocolStringList tupleList = clientService.getTupleSpacesState(qualifier);
+        System.out.println("Ok");
+        for (String tuple : tupleList) {
+            System.out.println(tuple);
+        }
     }
 
     private void sleep(String[] split) {

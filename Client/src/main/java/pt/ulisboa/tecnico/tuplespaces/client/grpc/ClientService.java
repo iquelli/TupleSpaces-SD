@@ -1,13 +1,18 @@
 package pt.ulisboa.tecnico.tuplespaces.client.grpc;
 
+import com.google.protobuf.ProtocolStringList;
+
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;
-import pt.ulisboa.tecnico.tuplespaces.centralized.contract.TupleSpacesGrpc;
 import pt.ulisboa.tecnico.tuplespaces.centralized.contract.TupleSpacesCentralized.PutRequest;
 import pt.ulisboa.tecnico.tuplespaces.centralized.contract.TupleSpacesCentralized.ReadRequest;
+import pt.ulisboa.tecnico.tuplespaces.centralized.contract.TupleSpacesCentralized.ReadResponse;
 import pt.ulisboa.tecnico.tuplespaces.centralized.contract.TupleSpacesCentralized.TakeRequest;
+import pt.ulisboa.tecnico.tuplespaces.centralized.contract.TupleSpacesCentralized.TakeResponse;
 import pt.ulisboa.tecnico.tuplespaces.centralized.contract.TupleSpacesCentralized.getTupleSpacesStateRequest;
+import pt.ulisboa.tecnico.tuplespaces.centralized.contract.TupleSpacesCentralized.getTupleSpacesStateResponse;
+import pt.ulisboa.tecnico.tuplespaces.centralized.contract.TupleSpacesGrpc;
 
 public class ClientService extends TupleSpacesGrpc.TupleSpacesImplBase implements AutoCloseable {
 
@@ -25,17 +30,31 @@ public class ClientService extends TupleSpacesGrpc.TupleSpacesImplBase implement
         stub.put(PutRequest.newBuilder().setNewTuple(newTuple).build());
     }
 
-    public void read(String searchPattern) throws StatusRuntimeException {
-        stub.read(ReadRequest.newBuilder().setSearchPattern(searchPattern).build());
+    public String read(String searchPattern) throws StatusRuntimeException {
+        ReadResponse response = stub.read(
+                ReadRequest.newBuilder().setSearchPattern(searchPattern).build()
+        );
+
+        return response.getResult();
     }
 
-    public void take(String searchPattern) throws StatusRuntimeException {
-        stub.take(TakeRequest.newBuilder().setSearchPattern(searchPattern).build());
+    public String take(String searchPattern) throws StatusRuntimeException {
+        TakeResponse response = stub.take(
+                TakeRequest.newBuilder().setSearchPattern(searchPattern).build()
+        );
+
+        return response.getResult();
     }
 
-    public void getTupleSpacesState(String qualifier) throws StatusRuntimeException {
+    public ProtocolStringList getTupleSpacesState(
+            String qualifier
+    ) throws StatusRuntimeException {
         // TODO IMPLEMENT - need name server logic to implement qualifier
-        stub.getTupleSpacesState(getTupleSpacesStateRequest.newBuilder().build());
+        getTupleSpacesStateResponse response = stub.getTupleSpacesState(
+                getTupleSpacesStateRequest.newBuilder().build()
+        );
+
+        return response.getTupleList();
     }
 
     @Override
