@@ -1,9 +1,15 @@
 package pt.ulisboa.tecnico.tuplespaces.server.domain;
 
+import pt.ulisboa.tecnico.tuplespaces.server.exceptions.InvalidTupleException;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class ServerState {
+
+    private static final String SPACE = " ";
+    private static final String BGN_TUPLE = "<";
+    private static final String END_TUPLE = ">";
 
     private List<String> tuples;
 
@@ -12,12 +18,17 @@ public class ServerState {
     }
 
     public void put(String tuple) {
-        // TODO: verify tuple is valid
-        tuples.add(tuple);
+        if (checkTupleValidity(tuple)) {
+            tuples.add(tuple);
+        } else {
+            throw new InvalidTupleException(tuple);
+        }
     }
 
     private String getMatchingTuple(String pattern) {
-        // TODO: verify pattern validity
+        if (!checkTupleValidity(pattern)) {
+            throw new InvalidTupleException(pattern);
+        }
         for (String tuple : this.tuples) {
             if (tuple.matches(pattern)) {
                 return tuple;
@@ -31,13 +42,20 @@ public class ServerState {
     }
 
     public String take(String pattern) {
-        // TODO: take operation
-        return null;
+        String tuple = getMatchingTuple(pattern);
+        if (tuple != null) {
+            tuples.remove(tuple);
+        }
+        return tuple;
     }
 
     public List<String> getTupleSpacesState() {
-        // TODO: getTupleSpacesState operation
-        return null;
+        return tuples;
+    }
+
+    private boolean checkTupleValidity(String input) {
+        return input.length() >= 3 && input.startsWith(BGN_TUPLE) && input
+                .endsWith(END_TUPLE) && !input.contains(SPACE);
     }
 
 }

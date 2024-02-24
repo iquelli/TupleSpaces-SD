@@ -138,7 +138,7 @@ buildNumber.properties
 /.idea/
 /.settings/
 /Contract/.settings/
-/Server/.settings/
+/ServerR1/.settings/
 /Client/.settings/
 /.venv/
 /NameServer/NameServer.iml

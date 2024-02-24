@@ -18,12 +18,16 @@ import pt.ulisboa.tecnico.tuplespaces.server.domain.ServerState;
  **/
 public class TupleSpacesCentralizedServiceImpl extends TupleSpacesGrpc.TupleSpacesImplBase {
 
-    private final ServerState state = new ServerState();
+    private final ServerState state;
+
+    public TupleSpacesCentralizedServiceImpl() {
+        state = new ServerState();
+    }
 
     @Override
     public void put(
             PutRequest request,
-            StreamObserver<PutResponse> respObserverObserver
+            StreamObserver<PutResponse> responseObserver
     ) {
         // TODO: put service
     }
@@ -31,7 +35,7 @@ public class TupleSpacesCentralizedServiceImpl extends TupleSpacesGrpc.TupleSpac
     @Override
     public void read(
             ReadRequest request,
-            StreamObserver<ReadResponse> respObserverObserver
+            StreamObserver<ReadResponse> responseObserver
     ) {
         // TODO: read service
     }
@@ -39,7 +43,7 @@ public class TupleSpacesCentralizedServiceImpl extends TupleSpacesGrpc.TupleSpac
     @Override
     public void take(
             TakeRequest request,
-            StreamObserver<TakeResponse> respObserverObserver
+            StreamObserver<TakeResponse> responseObserver
     ) {
         // TODO: take service
     }
@@ -47,7 +51,7 @@ public class TupleSpacesCentralizedServiceImpl extends TupleSpacesGrpc.TupleSpac
     @Override
     public void getTupleSpacesState(
             getTupleSpacesStateRequest request,
-            StreamObserver<getTupleSpacesStateResponse> respObserverObserver
+            StreamObserver<getTupleSpacesStateResponse> responseObserver
     ) {
         // TODO: getTupleSpacesState service
     }
