@@ -34,10 +34,10 @@ message TakePhase2Request {
   int32 clientId = 2;
 }
 message TakePhase2Response {
-
 }
 
-message getTupleSpacesStateRequest {}
+message getTupleSpacesStateRequest {
+}
 message getTupleSpacesStateResponse {
   repeated string tuple = 1;
 }

@@ -1,7 +1,6 @@
 package pt.ulisboa.tecnico.tuplespaces.client.grpc;
 
 import com.google.protobuf.ProtocolStringList;
-
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;

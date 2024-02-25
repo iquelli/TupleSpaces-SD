@@ -1,5 +1,6 @@
 package pt.ulisboa.tecnico.tuplespaces.server.service;
 
+import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 import pt.ulisboa.tecnico.tuplespaces.centralized.contract.TupleSpacesCentralized.PutRequest;
 import pt.ulisboa.tecnico.tuplespaces.centralized.contract.TupleSpacesCentralized.PutResponse;
@@ -11,6 +12,10 @@ import pt.ulisboa.tecnico.tuplespaces.centralized.contract.TupleSpacesCentralize
 import pt.ulisboa.tecnico.tuplespaces.centralized.contract.TupleSpacesCentralized.getTupleSpacesStateResponse;
 import pt.ulisboa.tecnico.tuplespaces.centralized.contract.TupleSpacesGrpc;
 import pt.ulisboa.tecnico.tuplespaces.server.domain.ServerState;
+import pt.ulisboa.tecnico.tuplespaces.server.exceptions.InexistantTupleException;
+import pt.ulisboa.tecnico.tuplespaces.server.exceptions.InvalidTupleException;
+
+import java.util.List;
 
 /**
  * Implements the TupleSpaces Centralized Variant service, handling gRPC
@@ -29,7 +34,23 @@ public class TupleSpacesCentralizedServiceImpl extends TupleSpacesGrpc.TupleSpac
             PutRequest request,
             StreamObserver<PutResponse> responseObserver
     ) {
-        // TODO: put service
+        try {
+            state.put(request.getNewTuple());
+
+            // Use responseObserver to send a single response back
+            responseObserver.onNext(PutResponse.getDefaultInstance());
+            responseObserver.onCompleted();
+        } catch (InvalidTupleException e) {
+            responseObserver.onError(
+                    Status.INVALID_ARGUMENT.withDescription(e.getMessage())
+                            .asRuntimeException()
+            );
+        } catch (RuntimeException e) {
+            responseObserver.onError(
+                    Status.UNKNOWN.withDescription(e.getMessage())
+                            .asRuntimeException()
+            );
+        }
     }
 
     @Override
@@ -37,7 +58,31 @@ public class TupleSpacesCentralizedServiceImpl extends TupleSpacesGrpc.TupleSpac
             ReadRequest request,
             StreamObserver<ReadResponse> responseObserver
     ) {
-        // TODO: read service
+        try {
+            String tuple = state.read(request.getSearchPattern());
+            ReadResponse response = ReadResponse.newBuilder()
+                    .setResult(tuple)
+                    .build();
+
+            // Use responseObserver to send a single response back
+            responseObserver.onNext(response);
+            responseObserver.onCompleted();
+        } catch (InvalidTupleException e) {
+            responseObserver.onError(
+                    Status.INVALID_ARGUMENT.withDescription(e.getMessage())
+                            .asRuntimeException()
+            );
+        } catch (InexistantTupleException e) {
+            responseObserver.onError(
+                    Status.UNAVAILABLE.withDescription(e.getMessage())
+                            .asRuntimeException()
+            );
+        } catch (RuntimeException e) {
+            responseObserver.onError(
+                    Status.UNKNOWN.withDescription(e.getMessage())
+                            .asRuntimeException()
+            );
+        }
     }
 
     @Override
@@ -45,7 +90,31 @@ public class TupleSpacesCentralizedServiceImpl extends TupleSpacesGrpc.TupleSpac
             TakeRequest request,
             StreamObserver<TakeResponse> responseObserver
     ) {
-        // TODO: take service
+        try {
+            String tuple = state.take(request.getSearchPattern());
+            TakeResponse response = TakeResponse.newBuilder()
+                    .setResult(tuple)
+                    .build();
+
+            // Use responseObserver to send a single response back
+            responseObserver.onNext(response);
+            responseObserver.onCompleted();
+        } catch (InvalidTupleException e) {
+            responseObserver.onError(
+                    Status.INVALID_ARGUMENT.withDescription(e.getMessage())
+                            .asRuntimeException()
+            );
+        } catch (InexistantTupleException e) {
+            responseObserver.onError(
+                    Status.UNAVAILABLE.withDescription(e.getMessage())
+                            .asRuntimeException()
+            );
+        } catch (RuntimeException e) {
+            responseObserver.onError(
+                    Status.UNKNOWN.withDescription(e.getMessage())
+                            .asRuntimeException()
+            );
+        }
     }
 
     @Override
@@ -53,7 +122,25 @@ public class TupleSpacesCentralizedServiceImpl extends TupleSpacesGrpc.TupleSpac
             getTupleSpacesStateRequest request,
             StreamObserver<getTupleSpacesStateResponse> responseObserver
     ) {
-        // TODO: getTupleSpacesState service
+        try {
+            // Get the tuples from the space state
+            List<String> tuples = state.getTupleSpacesState();
+
+            // Builder to construct a new Protobuffer object
+            getTupleSpacesStateResponse response = getTupleSpacesStateResponse
+                    .newBuilder()
+                    .addAllTuple(tuples)
+                    .build();
+
+            // Use responseObserver to send a single response back
+            responseObserver.onNext(response);
+            responseObserver.onCompleted();
+        } catch (RuntimeException e) {
+            responseObserver.onError(
+                    Status.UNKNOWN.withDescription(e.getMessage())
+                            .asRuntimeException()
+            );
+        }
     }
 
 }

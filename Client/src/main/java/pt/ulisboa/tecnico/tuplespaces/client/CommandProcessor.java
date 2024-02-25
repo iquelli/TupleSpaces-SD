@@ -1,11 +1,10 @@
 package pt.ulisboa.tecnico.tuplespaces.client;
 
+import com.google.protobuf.ProtocolStringList;
 import io.grpc.StatusRuntimeException;
 import pt.ulisboa.tecnico.tuplespaces.client.grpc.ClientService;
 
 import java.util.Scanner;
-
-import com.google.protobuf.ProtocolStringList;
 
 public class CommandProcessor {
 
@@ -74,7 +73,9 @@ public class CommandProcessor {
                     System.err.println("gRCP Error: " + e.getMessage());
                 }
             } catch (Exception e) {
-                System.err.println("An unexpected error occurred: " + e.getMessage());
+                System.err.println(
+                        "An unexpected error occurred: " + e.getMessage()
+                );
             }
         }
     }
@@ -136,7 +137,9 @@ public class CommandProcessor {
         String qualifier = split[1];
 
         // get the tuple spaces state
-        ProtocolStringList tupleList = clientService.getTupleSpacesState(qualifier);
+        ProtocolStringList tupleList = clientService.getTupleSpacesState(
+                qualifier
+        );
         System.out.println("Ok");
         for (String tuple : tupleList) {
             System.out.println(tuple);

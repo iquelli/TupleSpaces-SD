@@ -1,5 +1,6 @@
 package pt.ulisboa.tecnico.tuplespaces.server.domain;
 
+import pt.ulisboa.tecnico.tuplespaces.server.exceptions.InexistantTupleException;
 import pt.ulisboa.tecnico.tuplespaces.server.exceptions.InvalidTupleException;
 
 import java.util.ArrayList;
@@ -34,7 +35,7 @@ public class ServerState {
                 return tuple;
             }
         }
-        return null;
+        throw new InexistantTupleException(pattern);
     }
 
     public String read(String pattern) {
