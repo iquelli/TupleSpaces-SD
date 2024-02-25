@@ -44,9 +44,7 @@ public class ServerState {
 
     public String take(String pattern) {
         String tuple = getMatchingTuple(pattern);
-        if (tuple != null) {
-            tuples.remove(tuple);
-        }
+        tuples.remove(tuple);
         return tuple;
     }
 

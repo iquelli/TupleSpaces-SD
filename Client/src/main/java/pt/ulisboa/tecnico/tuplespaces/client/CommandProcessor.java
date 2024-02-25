@@ -1,9 +1,9 @@
 package pt.ulisboa.tecnico.tuplespaces.client;
 
-import com.google.protobuf.ProtocolStringList;
 import io.grpc.StatusRuntimeException;
 import pt.ulisboa.tecnico.tuplespaces.client.grpc.ClientService;
 
+import java.util.List;
 import java.util.Scanner;
 
 public class CommandProcessor {
@@ -26,7 +26,6 @@ public class CommandProcessor {
     }
 
     void parseInput() {
-
         Scanner scanner = new Scanner(System.in);
         boolean exit = false;
 
@@ -36,8 +35,6 @@ public class CommandProcessor {
             String[] split = line.split(SPACE);
 
             try {
-
-
                 switch (split[0]) {
                     case PUT:
                         this.put(split);
@@ -67,7 +64,7 @@ public class CommandProcessor {
             } catch (StatusRuntimeException e) {
                 if (e.getStatus().getDescription() != null) {
                     System.err.println(
-                            "gRCP Error: " + e.getStatus().getDescription()
+                            e.getStatus().getDescription()
                     );
                 } else {
                     System.err.println("gRCP Error: " + e.getMessage());
@@ -78,8 +75,8 @@ public class CommandProcessor {
                 );
             }
         }
+        scanner.close();
     }
-
 
     private void put(String[] split) {
         // check if input is valid
@@ -93,7 +90,7 @@ public class CommandProcessor {
 
         // put the tuple
         clientService.put(tuple);
-        System.out.println("Ok");
+        System.out.println("OK");
     }
 
     private void read(String[] split) {
@@ -108,10 +105,9 @@ public class CommandProcessor {
 
         // read the tuple
         String responseTuple = clientService.read(tuple);
-        System.out.println("Ok");
+        System.out.println("OK");
         System.out.println(responseTuple);
     }
-
 
     private void take(String[] split) {
         // check if input is valid
@@ -125,7 +121,7 @@ public class CommandProcessor {
 
         // take the tuple
         String responseTuple = clientService.take(tuple);
-        System.out.println("Ok");
+        System.out.println("OK");
         System.out.println(responseTuple);
     }
 
@@ -137,10 +133,10 @@ public class CommandProcessor {
         String qualifier = split[1];
 
         // get the tuple spaces state
-        ProtocolStringList tupleList = clientService.getTupleSpacesState(
+        List<String> tupleList = clientService.getTupleSpacesState(
                 qualifier
         );
-        System.out.println("Ok");
+        System.out.println("OK");
         for (String tuple : tupleList) {
             System.out.println(tuple);
         }

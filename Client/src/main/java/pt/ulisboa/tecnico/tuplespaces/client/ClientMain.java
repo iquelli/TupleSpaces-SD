@@ -5,16 +5,13 @@ import pt.ulisboa.tecnico.tuplespaces.client.grpc.ClientService;
 public class ClientMain {
 
     public static void main(String[] args) {
-
-        System.out.println(ClientMain.class.getSimpleName());
-
-        // receive and print arguments
+        // Receive and print arguments
         System.out.printf("Received %d arguments%n", args.length);
         for (int i = 0; i < args.length; i++) {
             System.out.printf("arg[%d] = %s%n", i, args[i]);
         }
 
-        // check arguments
+        // Check arguments
         if (args.length != 2) {
             System.err.println("Argument(s) missing!");
             System.err.println(
@@ -23,16 +20,23 @@ public class ClientMain {
             return;
         }
 
-        // get the host and the port
+        // Get the host and the port
         final String host = args[0];
         final String port = args[1];
 
-        // named servers not implemented yet
+        // Check port validity
+        if (Integer.parseInt(port) <= 0 || Integer.parseInt(port) >= 65536) {
+            System.err.println(
+                    "Invalid port number, it should be between 1 and 65535."
+            );
+            return;
+        }
+
+        // Named servers not implemented yet
         try (var clientService = new ClientService(host, port)) {
             CommandProcessor parser = new CommandProcessor(clientService);
             parser.parseInput();
         }
-
     }
 
 }
