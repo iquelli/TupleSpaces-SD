@@ -30,7 +30,7 @@ public class CommandProcessor {
         boolean exit = false;
 
         while (!exit) {
-            System.out.print("> ");
+            System.out.print("\n> ");
             String line = scanner.nextLine().trim();
             String[] split = line.split(SPACE);
 
@@ -193,7 +193,7 @@ public class CommandProcessor {
                         "- take <element[,more_elements]>\n" +
                         "- getTupleSpacesState <server>\n" +
                         "- sleep <integer>\n" +
-                        "- setdelay <server> <integer>\n" + "- exit\n"
+                        "- setdelay <server> <integer>\n" + "- exit"
         );
     }
 

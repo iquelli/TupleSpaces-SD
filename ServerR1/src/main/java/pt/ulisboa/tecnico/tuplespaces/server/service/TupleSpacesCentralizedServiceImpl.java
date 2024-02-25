@@ -12,7 +12,6 @@ import pt.ulisboa.tecnico.tuplespaces.centralized.contract.TupleSpacesCentralize
 import pt.ulisboa.tecnico.tuplespaces.centralized.contract.TupleSpacesCentralized.getTupleSpacesStateResponse;
 import pt.ulisboa.tecnico.tuplespaces.centralized.contract.TupleSpacesGrpc;
 import pt.ulisboa.tecnico.tuplespaces.server.domain.ServerState;
-import pt.ulisboa.tecnico.tuplespaces.server.exceptions.InexistantTupleException;
 import pt.ulisboa.tecnico.tuplespaces.server.exceptions.InvalidTupleException;
 
 import java.util.List;
@@ -72,9 +71,12 @@ public class TupleSpacesCentralizedServiceImpl extends TupleSpacesGrpc.TupleSpac
                     Status.INVALID_ARGUMENT.withDescription(e.getMessage())
                             .asRuntimeException()
             );
-        } catch (InexistantTupleException e) {
+        } catch (InterruptedException e) {
             responseObserver.onError(
-                    Status.UNAVAILABLE.withDescription(e.getMessage())
+                    Status.CANCELLED.withDescription(
+                            "Client interrupted while waiting for tuple: " + e
+                                    .getMessage()
+                    )
                             .asRuntimeException()
             );
         } catch (RuntimeException e) {
@@ -104,9 +106,12 @@ public class TupleSpacesCentralizedServiceImpl extends TupleSpacesGrpc.TupleSpac
                     Status.INVALID_ARGUMENT.withDescription(e.getMessage())
                             .asRuntimeException()
             );
-        } catch (InexistantTupleException e) {
+        } catch (InterruptedException e) {
             responseObserver.onError(
-                    Status.UNAVAILABLE.withDescription(e.getMessage())
+                    Status.CANCELLED.withDescription(
+                            "Client interrupted while waiting for tuple: " + e
+                                    .getMessage()
+                    )
                             .asRuntimeException()
             );
         } catch (RuntimeException e) {

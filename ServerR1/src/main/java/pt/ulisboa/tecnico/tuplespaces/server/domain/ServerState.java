@@ -1,6 +1,5 @@
 package pt.ulisboa.tecnico.tuplespaces.server.domain;
 
-import pt.ulisboa.tecnico.tuplespaces.server.exceptions.InexistantTupleException;
 import pt.ulisboa.tecnico.tuplespaces.server.exceptions.InvalidTupleException;
 
 import java.util.ArrayList;
@@ -19,32 +18,54 @@ public class ServerState {
     }
 
     public void put(String tuple) {
-        if (checkTupleValidity(tuple)) {
-            tuples.add(tuple);
-        } else {
+        if (!checkInput(tuple)) {
             throw new InvalidTupleException(tuple);
+        }
+        synchronized (tuples) {
+            tuples.add(tuple);
+            // We notify that a new tuple was inserted that could match
+            // the pattern.
+            tuples.notifyAll();
         }
     }
 
     private String getMatchingTuple(String pattern) {
-        if (!checkTupleValidity(pattern)) {
-            throw new InvalidTupleException(pattern);
-        }
         for (String tuple : this.tuples) {
             if (tuple.matches(pattern)) {
                 return tuple;
             }
         }
-        throw new InexistantTupleException(pattern);
+        return null;
     }
 
-    public String read(String pattern) {
-        return getMatchingTuple(pattern);
+    public String read(String pattern) throws InterruptedException {
+        if (!checkInput(pattern)) {
+            throw new InvalidTupleException(pattern);
+        }
+        String tuple = null;
+        // We look in the tuple space for the given pattern, and return the
+        // first tuple that matches.
+        // If there is no tuple that matches the pattern, it waits until it does.
+        synchronized (tuples) {
+            while ((tuple = getMatchingTuple(pattern)) == null) {
+                tuples.wait();
+            }
+        }
+        return tuple;
     }
 
-    public String take(String pattern) {
-        String tuple = getMatchingTuple(pattern);
-        tuples.remove(tuple);
+    public String take(String pattern) throws InterruptedException {
+        if (!checkInput(pattern)) {
+            throw new InvalidTupleException(pattern);
+        }
+        String tuple = null;
+        synchronized (tuples) {
+            while ((tuple = getMatchingTuple(pattern)) == null) {
+                tuples.wait();
+            }
+            // We remove the tuple after waiting for it.
+            tuples.remove(tuple);
+        }
         return tuple;
     }
 
@@ -52,7 +73,7 @@ public class ServerState {
         return tuples;
     }
 
-    private boolean checkTupleValidity(String input) {
+    private boolean checkInput(String input) {
         return input.length() >= 3 && input.startsWith(BGN_TUPLE) && input
                 .endsWith(END_TUPLE) && !input.contains(SPACE);
     }

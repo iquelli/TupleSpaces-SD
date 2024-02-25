@@ -5,6 +5,8 @@ import pt.ulisboa.tecnico.tuplespaces.client.grpc.ClientService;
 public class ClientMain {
 
     public static void main(String[] args) {
+        System.out.println(ClientMain.class.getSimpleName());
+
         // Receive and print arguments
         System.out.printf("Received %d arguments%n", args.length);
         for (int i = 0; i < args.length; i++) {
