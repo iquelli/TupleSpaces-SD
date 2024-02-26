@@ -46,7 +46,7 @@ class ServiceEntry:
 
     def search_for_servers(self, qualifier):
         servers_list = []
-        if qualifier is None:
+        if qualifier == "":
             return self.servers
 
         if not validate_qualifier(qualifier):
