@@ -44,7 +44,9 @@ public class NameServerService implements AutoCloseable {
         );
     }
 
-    public ServerAddress lookup (String qualifier) throws ServerUnreachableException {
+    public ServerAddress lookup(
+            String qualifier
+    ) throws ServerUnreachableException {
         LookupResponse response = stub.lookup(
                 LookupRequest.newBuilder()
                         .setServiceName(SERVICE_NAME)

@@ -2,6 +2,8 @@ import sys
 
 sys.path.insert(1, "../Contract/target/generated-sources/protobuf/python")
 
+import logging
+import argparse
 import grpc
 import NameServer_pb2 as pb2
 import NameServer_pb2_grpc as pb2_grpc
@@ -13,9 +15,18 @@ PORT = 5001
 
 if __name__ == "__main__":
     try:
-        if len(sys.argv) != 1:
-            print("Server does not receive arguments!")
+        if len(sys.argv) > 2:
+            print("Too many arguments passed!")
+            print("Usage: python ./server.py [-log=<log_level]")
             exit(1)
+
+        # Setup logger
+        parser = argparse.ArgumentParser()
+        parser.add_argument("-log", default="INFO")
+        logging.basicConfig(
+            format="[%(levelname)s]: %(message)s",
+            level=parser.parse_args().log.upper(),
+        )
 
         print("NameServer started")
         # Create server
@@ -29,7 +40,7 @@ if __name__ == "__main__":
         # Print message
         print("Server listening on port " + str(PORT))
         # Print termination message
-        print("Press CTRL+C to terminate")
+        print("Press CTRL+C to terminate\n")
         # Wait for server to finish
         server.wait_for_termination()
 

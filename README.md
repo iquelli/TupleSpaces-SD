@@ -77,7 +77,8 @@ python server.py
 
 #### Running in Debug Mode
 
-To execute any of the modules in debug mode, add `-Ddebug` to the previous `mvn` commands.
+To execute any of the modules in debug mode, add `-Ddebug` to the previous `mvn` commands
+and `-log=DEBUG` to the previous `python` command.
 
 ### Formatting
 

@@ -10,25 +10,25 @@ EXCEPTIONS
 class UnsuccessfulServerRegisterException(Exception):
     """Exception raised when it's not possible to register the server."""
 
-    def __init__(self, message):
-        super().__init__(message)
+    def __init__(self):
         self.message = "Not possible to register the server"
+        super().__init__(self.message)
 
 
 class UnsuccessfulServerDeleteException(Exception):
     """Exception raised when it's not possible to delete the server."""
 
-    def __init__(self, message):
-        super().__init__(message)
+    def __init__(self):
         self.message = "Not possible to remove the server"
+        super().__init__(self.message)
 
 
 class InvalidServerArgumentsException(Exception):
     """Exception raised when the server has invalid arguments."""
 
-    def __init__(self, message):
-        super().__init__(message)
+    def __init__(self):
         self.message = "Server has invalid arguments"
+        super().__init__(self.message)
 
 
 """

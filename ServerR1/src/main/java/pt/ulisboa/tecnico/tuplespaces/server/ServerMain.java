@@ -39,8 +39,12 @@ public class ServerMain {
         final int port = optPort.getAsInt();
 
         final String qualifier = args[1];
-        if (qualifier == null || qualifier.isEmpty()) {
-            System.err.println("The qualifier must be a non-empty string");
+        if (qualifier == null || qualifier.isEmpty() ||
+                (!qualifier.equals("A") && !qualifier.equals("B") && !qualifier
+                        .equals("C"))) {
+            System.err.println(
+                    "The qualifier must be a non-empty string, that is either A, B or C"
+            );
             System.exit(1);
         }
 

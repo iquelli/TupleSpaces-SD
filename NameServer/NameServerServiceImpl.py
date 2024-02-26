@@ -4,7 +4,8 @@ sys.path.insert(1, "../Contract/target/generated-sources/protobuf/python")
 
 import NameServer_pb2 as pb2
 import NameServer_pb2_grpc as pb2_grpc
-
+import logging
+import grpc
 from utils import *
 
 
@@ -22,21 +23,12 @@ class ServerEntry:
         self.port = port
         self.qualifier = qualifier
 
-    def __str__(self):
-        return f"ServerEntry(host={self.host}, port={self.port}, qualifier={self.qualifier})"
-
 
 # This class will save a service name and a set of server entries
 class ServiceEntry:
     def __init__(self, service_name):
         self.service_name = service_name
         self.servers = []
-
-    def __str__(self):
-        servers_str = ", ".join(str(server) for server in self.servers)
-        return (
-            f"ServiceEntry(service_name={self.service_name}, servers=[{servers_str}])"
-        )
 
     def add_server(self, server_entry):
         if server_entry in self.servers:
@@ -52,13 +44,21 @@ class ServiceEntry:
         if not validate_qualifier(qualifier):
             raise InvalidServerArgumentsException
 
-        servers_list.append(server for server in self.servers if server.qualifier == qualifier)
+        servers_list.append(
+            server for server in self.servers if server.qualifier == qualifier
+        )
 
         return servers_list
 
     def remove_server(self, host, port):
         try:
-            self.servers.remove(next(server for server in self.servers if server.host == host and server.port == port))
+            self.servers.remove(
+                next(
+                    server
+                    for server in self.servers
+                    if server.host == host and server.port == port
+                )
+            )
         except StopIteration:
             raise UnsuccessfulServerDeleteException
 
@@ -82,8 +82,7 @@ class NameServerServiceImpl(pb2_grpc.NameServerServicer):
 
     def register(self, request, context):
         try:
-            print("Receiving register request:")
-            print(request)
+            logging.info("Receiving register request:\n" + str(request))
             service_name = request.serviceName
             qualifier = request.qualifier
             host = request.address.host
@@ -93,19 +92,21 @@ class NameServerServiceImpl(pb2_grpc.NameServerServicer):
                 ServerEntry(host, port, qualifier)
             )
 
-            response = pb2.RegisterResponse()
-            return response
-
-        except (
-            UnsuccessfulServerRegisterException,
-            InvalidServerArgumentsException,
-        ) as e:
-            print("Registration failed: ", e.message)
+            return pb2.RegisterResponse()
+        except InvalidServerArgumentsException:
+            logging.debug("Server has invalid arguments")
+            context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
+            context.set_details("Server has invalid arguments")
+            return pb2.RegisterResponse()
+        except UnsuccessfulServerRegisterException:
+            logging.debug("Not possible to register the server")
+            context.set_code(grpc.StatusCode.UNAVAILABLE)
+            context.set_details("Not possible to register the server")
+            return pb2.RegisterResponse()
 
     def lookup(self, request, context):
         try:
-            print("Receiving lookup request:")
-            print(request)
+            logging.info("Receiving lookup request:\n" + str(request))
             service_name = request.serviceName
             qualifier = request.qualifier
 
@@ -114,33 +115,30 @@ class NameServerServiceImpl(pb2_grpc.NameServerServicer):
             )
 
             response = pb2.LookupResponse()
-            for server in servers:
+            for s in servers:
                 server_info = response.server.add()
-                server_info.address.host = server.host
-                server_info.address.port = server.port
-                server_info.qualifier = server.qualifier
+                server_info.address.host = s.host
+                server_info.address.port = s.port
+                server_info.qualifier = s.qualifier
             return response
-
-        except InvalidServerArgumentsException as e:
-            print("Lookup failed: ", e.message)
+        except InvalidServerArgumentsException:
+            logging.debug("Server has invalid arguments")
+            context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
+            context.set_details("Server has invalid arguments")
+            return pb2.LookupResponse()
 
     def delete(self, request, context):
         try:
-            print("Receiving delete request:")
-            print(request)
+            logging.info("Receiving delete request:\n" + str(request))
             service_name = request.serviceName
             host = request.address.host
             port = request.address.port
 
-            self.server.service_map[service_name].remove_server(
-                host, port
-            )
+            self.server.service_map[service_name].remove_server(host, port)
 
-            response = pb2.DeleteResponse()
-            return response
-
-        except (
-            UnsuccessfulServerDeleteException,
-            InvalidServerArgumentsException,
-        ) as e:
-            print("Delete failed: ", e.message)
+            return pb2.DeleteResponse()
+        except UnsuccessfulServerDeleteException:
+            logging.debug("Not possible to remove the server")
+            context.set_code(grpc.StatusCode.UNAVAILABLE)
+            context.set_details("Not possible to remove the server")
+            return pb2.DeleteResponse()
