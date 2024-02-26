@@ -5,6 +5,8 @@ sys.path.insert(1, "../Contract/target/generated-sources/protobuf/python")
 import NameServer_pb2 as pb2
 import NameServer_pb2_grpc as pb2_grpc
 
+from utils import *
+
 
 # This class contains information for each server, namely its address and qualifier
 class ServerEntry:
@@ -50,16 +52,15 @@ class ServiceEntry:
         if not validate_qualifier(qualifier):
             raise InvalidServerArgumentsException
 
-        for server in self.servers:
-            if server.qualifier == qualifier:
-                servers_list.append(server)
+        servers_list.append(server for server in self.servers if server.qualifier == qualifier)
+
         return servers_list
 
-    def remove_server(self, server_entry):
-        if server_entry not in self.servers:
+    def remove_server(self, host, port):
+        try:
+            self.servers.remove(next(server for server in self.servers if server.host == host and server.port == port))
+        except StopIteration:
             raise UnsuccessfulServerDeleteException
-
-        self.servers.remove(server_entry)
 
 
 # This class is responsible for mapping a service name to its
@@ -128,12 +129,11 @@ class NameServerServiceImpl(pb2_grpc.NameServerServicer):
             print("Receiving delete request:")
             print(request)
             service_name = request.serviceName
-            qualifier = request.qualifier
             host = request.address.host
             port = request.address.port
 
-            self.server.service_map[service_name].remove(
-                ServerEntry(host, port, qualifier)
+            self.server.service_map[service_name].remove_server(
+                host, port
             )
 
             response = pb2.DeleteResponse()
