@@ -24,8 +24,8 @@ code dependency management, to ensure your code runs using the correct component
 
 The overall system is made up of several modules. The different types of servers are located in _ServerX_ (where X denotes stage 1, 2 or 3).
 The clients is in _Client_.
-The definition of messages and services is in _Contract_. The future naming server
-is in _NamingServer_.
+The definition of messages and services is in _Contract_. The future name server
+is in _NameServer_.
 
 See the [Project Statement](https://github.com/tecnico-distsys/TupleSpaces) for a complete domain and system description.
 
@@ -48,6 +48,36 @@ To compile and install all modules:
 ```s
 mvn clean install
 ```
+
+After that, go to the `Contract` folder and run the following command:
+
+```s
+mvn exec:exec
+```
+
+### Running
+
+To run the server, the following command can be performed in the respective server folder:
+
+```s
+mvn exec:java -Dexec.args="<port> <qualifier>"
+```
+
+To run the client, the following command can be performed in the respective client folder:
+
+```s
+mvn exec:java
+```
+
+To run the name server, the following command can be performed in the respective name server folder:
+
+```s
+python server.py
+```
+
+#### Running in Debug Mode
+
+To execute any of the modules in debug mode, add `-Ddebug` to the previous `mvn` commands.
 
 ### Formatting
 

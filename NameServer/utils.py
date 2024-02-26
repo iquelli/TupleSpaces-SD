@@ -51,7 +51,6 @@ def validate_port(port):
     return True
 
 
-# To validate received server qualifier
 def validate_qualifier(qualifier):
     if qualifier not in ["A", "B", "C"]:
         return False
