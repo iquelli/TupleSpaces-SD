@@ -1,6 +1,7 @@
 package pt.ulisboa.tecnico.tuplespaces.client;
 
 import pt.ulisboa.tecnico.tuplespaces.client.grpc.ClientService;
+import pt.ulisboa.tecnico.tuplespaces.common.grpc.NameServerService;
 
 public class ClientMain {
 
@@ -33,6 +34,8 @@ public class ClientMain {
             );
             return;
         }
+
+        final NameServerService nameServerService = new NameServerService();
 
         // Named servers not implemented yet
         try (var clientService = new ClientService(host, port)) {
