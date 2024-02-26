@@ -1,22 +1,27 @@
 import sys
+
+sys.path.insert(1, "../Contract/target/generated-sources/protobuf/python")
 import NameServer_pb2 as pb2
 import NameServer_pb2_grpc as pb2_grpc
 from utils import *
 
-sys.path.insert(1, '../Contract/target/generated-sources/protobuf/python')
-
 
 # this class contains information for each server, namely its address and qualifier
 class ServerEntry:
-    def __init__(self, qualifier, address):
-        if not (validate_address(address) and validate_qualifier(qualifier)):
+    def __init__(self, qualifier, host, port):
+        if not (
+            validate_host(host)
+            and validate_qualifier(qualifier)
+            and validate_port(port)
+        ):
             raise InvalidServerArguments
 
         self.qualifier = qualifier
-        self.address = address
+        self.host = host
+        self.port = port
 
     def __str__(self):
-        return f"ServerEntry(host_address={self.address}, qualifier={self.qualifier})"
+        return f"ServerEntry(host={self.host}, port={self.port} qualifier={self.qualifier})"
 
 
 # this class will save a service name and a set of server entries
@@ -27,7 +32,9 @@ class ServiceEntry:
 
     def __str__(self):
         servers_str = ", ".join(str(server) for server in self.servers)
-        return f"ServiceEntry(service_name={self.service_name}, servers=[{servers_str}])"
+        return (
+            f"ServiceEntry(service_name={self.service_name}, servers=[{servers_str}])"
+        )
 
     def add_server(self, server_entry):
         if server_entry in self.servers:
@@ -75,13 +82,16 @@ class NameServerServiceImpl(pb2_grpc.NameServerServicer):
         try:
             print(request)
             # get service name
-            service_name = request.service_name
+            service_name = request.serviceName
             # get server qualifier
             qualifier = request.qualifier
             # get server address
-            address = request.address
+            host = request.address.host
+            port = request.address.port
 
-            self.server.service_map[service_name].add_server(ServerEntry(qualifier, address))
+            self.server.service_map[service_name].add_server(
+                ServerEntry(qualifier, host, port)
+            )
 
             # create response
             response = pb2.RegisterResponse()
@@ -97,14 +107,21 @@ class NameServerServiceImpl(pb2_grpc.NameServerServicer):
             # print the received request
             print(request)
             # get service name
-            service_name = request.service_name
+            service_name = request.serviceName
             # get server qualifier
             qualifier = request.qualifier
 
-            servers = self.server.service_map[service_name].search_for_servers(qualifier)
+            servers = self.server.service_map[service_name].search_for_servers(
+                qualifier
+            )
 
             # create response
-            response = pb2.LookupResponse(servers=servers)
+            response = pb2.LookupResponse()
+            for server in servers:
+                server_info = response.server.add()
+                server_info.address.host = server.host
+                server_info.address.port = server.port
+                server_info.qualifier = server.qualifier
 
             # return response
             return response
@@ -124,7 +141,9 @@ class NameServerServiceImpl(pb2_grpc.NameServerServicer):
             # get server address
             address = request.address
 
-            self.server.service_map[service_name].remove(ServerEntry(qualifier, address))
+            self.server.service_map[service_name].remove(
+                ServerEntry(qualifier, address)
+            )
 
             # create response
             response = pb2.DeleteResponse()

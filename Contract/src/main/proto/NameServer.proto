@@ -1,27 +1,37 @@
 syntax = "proto3";
 package pt.ulisboa.tecnico.tuplespaces.nameserver.contract;
 
-message RegisterRequest {
-  string service_name = 1;
+message ServerAddress {
+  string host = 1;
+  int32 port = 2;
+}
+
+message ServerInfo {
+  ServerAddress address = 1;
   string qualifier = 2;
-  string server_address = 3;
+}
+
+message RegisterRequest {
+  string serviceName = 1;
+  string qualifier = 2;
+  ServerAddress address = 3;
 }
 
 message RegisterResponse {
 }
 
 message LookupRequest {
-  string service_name = 1;
+  string serviceName = 1;
   string qualifier = 2;
 }
 
 message LookupResponse {
-  repeated string servers = 1;
+  repeated ServerInfo server = 1;
 }
 
 message DeleteRequest {
-  string service_name = 1;
-  string server_address = 2;
+  string serviceName = 1;
+  ServerAddress address = 2;
 }
 
 message DeleteResponse {

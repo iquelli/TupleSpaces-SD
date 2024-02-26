@@ -35,32 +35,27 @@ FUNCTIONS
 """
 
 
-# To validate received server address
-def validate_address(address):
-    # Split the address into host and port
-    host, port = address.split(':')
-
-    # Validate host
+def validate_host(host):
     if not host:
         return False
+    return True
 
-    # Validate port number
+
+
+def validate_port(port):
     try:
         port_num = int(port)
         if not (1024 <= port_num <= 65535):
             return False
     except ValueError:
         return False
-
     return True
+    
 
 
-# To validate received server qualifier
 def validate_qualifier(qualifier):
-    # Split the address into host and port
-
-    # Validate host
     if qualifier not in ["A", "B", "C"]:
         return False
 
     return True
+
