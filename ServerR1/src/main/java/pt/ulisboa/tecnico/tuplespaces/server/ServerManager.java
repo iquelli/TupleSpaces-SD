@@ -1,6 +1,6 @@
 package pt.ulisboa.tecnico.tuplespaces.server;
 
-import pt.ulisboa.tecnico.tuplespaces.server.grpc.NameServerService;
+import pt.ulisboa.tecnico.tuplespaces.common.grpc.NameServerService;
 
 public class ServerManager {
 

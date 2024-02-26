@@ -14,10 +14,10 @@ public class ClientMain {
         }
 
         // Check arguments
-        if (args.length != 2) {
-            System.err.println("Argument(s) missing!");
+        if (args.length != 0) {
+            System.err.println("Too many arguments!");
             System.err.println(
-                    "Usage: mvn exec:java -Dexec.args=<host> <port>"
+                    "Usage: mvn exec:java"
             );
             System.exit(1);
         }

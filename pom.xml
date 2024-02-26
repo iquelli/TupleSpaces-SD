@@ -14,6 +14,7 @@
         builds the selected projects in order. -->
     <modules>
         <module>Contract</module>
+        <module>Common</module>
         <module>Client</module>
         <module>ServerR1</module>
 

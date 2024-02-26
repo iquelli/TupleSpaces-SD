@@ -1,4 +1,4 @@
-package pt.ulisboa.tecnico.tuplespaces.server.grpc;
+package pt.ulisboa.tecnico.tuplespaces.common.grpc;
 
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
