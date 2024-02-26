@@ -3,6 +3,7 @@ package pt.ulisboa.tecnico.tuplespaces.server;
 import io.grpc.BindableService;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
+import pt.ulisboa.tecnico.tuplespaces.common.grpc.NameServerService;
 import pt.ulisboa.tecnico.tuplespaces.server.service.TupleSpacesCentralizedServiceImpl;
 
 import java.util.OptionalInt;
@@ -21,7 +22,7 @@ public class ServerMain {
 
         // Check number of arguments
         if (args.length != 2) {
-            System.err.println("Argument(s) missing!");
+            System.err.println("Wrong number of arguments!");
             System.err.println(
                     "Usage: mvn exec:java -Dexec.args=\"<port> <qualifier>\""
             );
@@ -43,7 +44,7 @@ public class ServerMain {
             System.exit(1);
         }
 
-        final ServerManager serverManager = new ServerManager(port, qualifier);
+        final NameServerService nameServerService = new NameServerService();
 
         final BindableService impl = new TupleSpacesCentralizedServiceImpl();
 
@@ -55,7 +56,7 @@ public class ServerMain {
         System.out.println("TupleSpaces server has started");
 
         try {
-            serverManager.registerToNameServer();
+            nameServerService.register(port, qualifier);
         } catch (Exception e) {
             System.err.println(
                     "Failed to register the server into the name server"
@@ -66,8 +67,8 @@ public class ServerMain {
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             System.out.println("TupleSpaces server is shutting down");
-            serverManager.deleteFromNameServer();
-            serverManager.shutdown();
+            nameServerService.delete(port);
+            nameServerService.close();
         }));
 
         // Do not exit the main thread. Wait until server is terminated.

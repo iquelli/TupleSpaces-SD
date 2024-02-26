@@ -8,13 +8,17 @@ import NameServer_pb2_grpc as pb2_grpc
 
 # This class contains information for each server, namely its address and qualifier
 class ServerEntry:
-    def __init__(self, qualifier, host, port):
-        # if not (validate_host(host) and validate_port(port) and validate_qualifier(qualifier)):
-        #     raise InvalidServerArgumentsException
+    def __init__(self, host, port, qualifier):
+        if not (
+            validate_host(host)
+            and validate_port(port)
+            and validate_qualifier(qualifier)
+        ):
+            raise InvalidServerArgumentsException
 
-        self.qualifier = qualifier
         self.host = host
         self.port = port
+        self.qualifier = qualifier
 
     def __str__(self):
         return f"ServerEntry(host={self.host}, port={self.port}, qualifier={self.qualifier})"
@@ -33,8 +37,8 @@ class ServiceEntry:
         )
 
     def add_server(self, server_entry):
-        # if server_entry in self.servers:
-        #     raise UnsuccessfulServerRegisterException
+        if server_entry in self.servers:
+            raise UnsuccessfulServerRegisterException
 
         self.servers.append(server_entry)
 
@@ -43,8 +47,8 @@ class ServiceEntry:
         if qualifier is None:
             return self.servers
 
-        # if not validate_qualifier(qualifier):
-        #     raise InvalidServerArgumentsException
+        if not validate_qualifier(qualifier):
+            raise InvalidServerArgumentsException
 
         for server in self.servers:
             if server.qualifier == qualifier:
@@ -52,8 +56,8 @@ class ServiceEntry:
         return servers_list
 
     def remove_server(self, server_entry):
-        # if server_entry not in self.servers:
-        #     raise UnsuccessfulServerDeleteException
+        if server_entry not in self.servers:
+            raise UnsuccessfulServerDeleteException
 
         self.servers.remove(server_entry)
 
@@ -76,57 +80,67 @@ class NameServerServiceImpl(pb2_grpc.NameServerServicer):
         self.server = NameServer()
 
     def register(self, request, context):
-        # try:
-        print("Receiving register request:")
-        print(request)
-        service_name = request.serviceName
-        qualifier = request.qualifier
-        host = request.address.host
-        port = request.address.port
+        try:
+            print("Receiving register request:")
+            print(request)
+            service_name = request.serviceName
+            qualifier = request.qualifier
+            host = request.address.host
+            port = request.address.port
 
-        self.server.service_map[service_name].add_server(
-            ServerEntry(qualifier, host, port)
-        )
+            self.server.service_map[service_name].add_server(
+                ServerEntry(host, port, qualifier)
+            )
 
-        response = pb2.RegisterResponse()
-        return response
+            response = pb2.RegisterResponse()
+            return response
 
-        # except (UnsuccessfulServerRegisterException, InvalidServerArgumentsException) as e:
-        #     print("Registration failed: ", e.message)
+        except (
+            UnsuccessfulServerRegisterException,
+            InvalidServerArgumentsException,
+        ) as e:
+            print("Registration failed: ", e.message)
 
     def lookup(self, request, context):
-        # try:
-        print("Receiving lookup request:")
-        print(request)
-        service_name = request.serviceName
-        qualifier = request.qualifier
+        try:
+            print("Receiving lookup request:")
+            print(request)
+            service_name = request.serviceName
+            qualifier = request.qualifier
 
-        servers = self.server.service_map[service_name].search_for_servers(qualifier)
+            servers = self.server.service_map[service_name].search_for_servers(
+                qualifier
+            )
 
-        response = pb2.LookupResponse()
-        for server in servers:
-            server_info = response.server.add()
-            server_info.address.host = server.host
-            server_info.address.port = server.port
-            server_info.qualifier = server.qualifier
-        return response
+            response = pb2.LookupResponse()
+            for server in servers:
+                server_info = response.server.add()
+                server_info.address.host = server.host
+                server_info.address.port = server.port
+                server_info.qualifier = server.qualifier
+            return response
 
-        # except InvalidServerArgumentsException as e:
-        #     print("Lookup failed: ", e.message)
+        except InvalidServerArgumentsException as e:
+            print("Lookup failed: ", e.message)
 
     def delete(self, request, context):
-        # try:
-        print("Receiving delete request:")
-        print(request)
-        service_name = request.serviceName
-        qualifier = request.qualifier
-        host = request.address.host
-        port = request.address.port
+        try:
+            print("Receiving delete request:")
+            print(request)
+            service_name = request.serviceName
+            qualifier = request.qualifier
+            host = request.address.host
+            port = request.address.port
 
-        self.server.service_map[service_name].remove(ServerEntry(qualifier, host, port))
+            self.server.service_map[service_name].remove(
+                ServerEntry(host, port, qualifier)
+            )
 
-        response = pb2.DeleteResponse()
-        return response
+            response = pb2.DeleteResponse()
+            return response
 
-        # except (UnsuccessfulServerDeleteException, InvalidServerArgumentsException) as e:
-        #     print("Delete failed: ", e.message)
+        except (
+            UnsuccessfulServerDeleteException,
+            InvalidServerArgumentsException,
+        ) as e:
+            print("Delete failed: ", e.message)

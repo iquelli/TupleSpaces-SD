@@ -27,10 +27,8 @@
         <version.exec-maven-plugin>3.0.0</version.exec-maven-plugin>
 
         <mainclass>pt.ulisboa.tecnico.tuplespaces.server.ServerMain</mainclass>
-        <server.host>localhost</server.host>
         <server.port>2001</server.port>
         <server.qual>A</server.qual>
-        <server.service>TupleSpaces</server.service>
 
         <spotless.java.eclipse.file>${project.basedir}${file.separator}..${file.separator}formatter-config.xml</spotless.java.eclipse.file>
     </properties>
@@ -71,10 +69,8 @@
                 <configuration>
                     <mainClass>${mainclass}</mainClass>
                     <arguments>
-                        <argument>${server.host}</argument>
                         <argument>${server.port}</argument>
                         <argument>${server.qual}</argument>
-                        <argument>${server.service}</argument>
                     </arguments>
                 </configuration>
                 <executions>
