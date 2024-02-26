@@ -5,13 +5,12 @@ import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import pt.ulisboa.tecnico.tuplespaces.server.service.TupleSpacesCentralizedServiceImpl;
 
-import java.io.IOException;
+import java.util.OptionalInt;
 
 public class ServerMain {
 
-    public static void main(
-            String[] args
-    ) throws IOException, InterruptedException {
+    public static void main(String[] args) throws Exception {
+        // TODO: add proper logging
         System.out.println(ServerMain.class.getSimpleName());
 
         // Receive and print arguments
@@ -24,34 +23,74 @@ public class ServerMain {
         if (args.length != 2) {
             System.err.println("Argument(s) missing!");
             System.err.println(
-                    "Usage: mvn exec:java -Dexec.args=<port> <qualifier>"
+                    "Usage: mvn exec:java -Dexec.args=\"<port> <qualifier>\""
             );
-            return;
+            System.exit(1);
         }
 
-        final int port = Integer.parseInt(args[0]);
-
-        // Check argument validity
-        if (port <= 0 || port >= 65536) {
+        final OptionalInt optPort = parsePort(args[0]);
+        if (optPort.isEmpty()) {
             System.err.println(
-                    "Invalid port number, it should be between 1 and 65535."
+                    "The port number must be an integer between 1024 and 65535"
             );
-            return;
+            System.exit(1);
         }
+        final int port = optPort.getAsInt();
+
+        final String qualifier = args[1];
+        if (qualifier == null || qualifier.isEmpty()) {
+            System.err.println("The qualifier must be a non-empty string");
+            System.exit(1);
+        }
+
+        final ServerManager serverManager = new ServerManager(port, qualifier);
 
         final BindableService impl = new TupleSpacesCentralizedServiceImpl();
 
         // Create a new server to listen on port
         Server server = ServerBuilder.forPort(port).addService(impl).build();
 
-        // Start the server
         server.start();
-
         // Server threads are running in the background.
-        System.out.println("TupleSpaces server has started!");
+        System.out.println("TupleSpaces server has started");
+
+        try {
+            serverManager.registerToNameServer();
+        } catch (Exception e) {
+            System.err.println(
+                    "Failed to register the server into the name server"
+            );
+            e.printStackTrace();
+            System.exit(1);
+        }
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            System.out.println("TupleSpaces server is shutting down");
+            serverManager.deleteFromNameServer();
+            serverManager.shutdown();
+        }));
 
         // Do not exit the main thread. Wait until server is terminated.
         server.awaitTermination();
+    }
+
+    /**
+     * Parses a string into a port number (1024 to 65535).
+     *
+     * @param strPort A string of the port number.
+     * @return An empty optional int in case the port is invalid, or an optional
+     *         int of the port number.
+     **/
+    private static OptionalInt parsePort(String strPort) {
+        try {
+            final int port = Integer.parseInt(strPort);
+            if (port < 1024 || port > 65535) {
+                return OptionalInt.empty();
+            }
+            return OptionalInt.of(port);
+        } catch (NumberFormatException e) {
+            return OptionalInt.empty();
+        }
     }
 
 }

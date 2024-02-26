@@ -16,7 +16,6 @@ message RegisterRequest {
   string qualifier = 2;
   ServerAddress address = 3;
 }
-
 message RegisterResponse {
 }
 
@@ -24,7 +23,6 @@ message LookupRequest {
   string serviceName = 1;
   string qualifier = 2;
 }
-
 message LookupResponse {
   repeated ServerInfo server = 1;
 }
@@ -33,7 +31,6 @@ message DeleteRequest {
   string serviceName = 1;
   ServerAddress address = 2;
 }
-
 message DeleteResponse {
 }
 

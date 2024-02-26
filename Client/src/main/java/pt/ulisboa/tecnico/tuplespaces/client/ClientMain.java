@@ -19,7 +19,7 @@ public class ClientMain {
             System.err.println(
                     "Usage: mvn exec:java -Dexec.args=<host> <port>"
             );
-            return;
+            System.exit(1);
         }
 
         // Get the host and the port
@@ -27,9 +27,9 @@ public class ClientMain {
         final String port = args[1];
 
         // Check port validity
-        if (Integer.parseInt(port) <= 0 || Integer.parseInt(port) >= 65536) {
+        if (Integer.parseInt(port) < 1024 || Integer.parseInt(port) > 65535) {
             System.err.println(
-                    "Invalid port number, it should be between 1 and 65535."
+                    "Invalid port number, it should be between 1024 and 65535."
             );
             return;
         }
