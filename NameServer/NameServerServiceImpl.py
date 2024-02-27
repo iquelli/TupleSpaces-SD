@@ -63,7 +63,6 @@ class ServiceEntry:
 class NameServer:
     def __init__(self):
         self.service_map = {}
-        self.register_service("TupleSpaces")
 
     def register_service(self, service_name):
         if service_name not in self.service_map:
@@ -83,6 +82,8 @@ class NameServerServiceImpl(pb2_grpc.NameServerServicer):
             host = request.address.host
             port = request.address.port
 
+            if service_name not in self.server.service_map:
+                self.server.register_service(service_name)
             self.server.service_map[service_name].add_server(
                 ServerEntry(host, port, qualifier)
             )
@@ -105,9 +106,11 @@ class NameServerServiceImpl(pb2_grpc.NameServerServicer):
             service_name = request.serviceName
             qualifier = request.qualifier
 
-            servers = self.server.service_map[service_name].search_for_servers(
-                qualifier
-            )
+            servers = []
+            if service_name in self.server.service_map:
+                servers = self.server.service_map[service_name].search_for_servers(
+                    qualifier
+                )
 
             response = pb2.LookupResponse()
             for s in servers:
@@ -136,7 +139,8 @@ class NameServerServiceImpl(pb2_grpc.NameServerServicer):
             host = request.address.host
             port = request.address.port
 
-            self.server.service_map[service_name].remove_server(host, port)
+            if service_name in self.server.service_map:
+                self.server.service_map[service_name].remove_server(host, port)
 
             return pb2.DeleteResponse()
         except UnsuccessfulServerDeleteException:

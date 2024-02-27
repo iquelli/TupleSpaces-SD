@@ -41,12 +41,8 @@ public class ServerMain {
         final int port = optPort.getAsInt();
 
         final String qualifier = args[1];
-        if (qualifier == null || qualifier.isEmpty() ||
-                (!qualifier.equals("A") && !qualifier.equals("B") && !qualifier
-                        .equals("C"))) {
-            System.err.println(
-                    "The qualifier must be a non-empty string, that is either A, B or C"
-            );
+        if (qualifier == null || qualifier.isEmpty()) {
+            System.err.println("The qualifier must be a non-empty string");
             System.exit(1);
         }
 
@@ -57,8 +53,15 @@ public class ServerMain {
         // Create a new server to listen on port
         Server server = ServerBuilder.forPort(port).addService(impl).build();
 
-        server.start();
-        // Server threads are running in the background.
+        try {
+            // Server threads are running in the background.
+            server.start();
+        } catch (Exception e) {
+            System.err.println(
+                    "Failed to start server to listen on port " + args[0]
+            );
+            System.exit(1);
+        }
 
         try {
             nameServerService.register(port, qualifier);

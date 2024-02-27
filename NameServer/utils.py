@@ -52,7 +52,4 @@ def validate_port(port):
 
 
 def validate_qualifier(qualifier):
-    if qualifier not in ["A", "B", "C"]:
-        return False
-
-    return True
+    return qualifier != ""
