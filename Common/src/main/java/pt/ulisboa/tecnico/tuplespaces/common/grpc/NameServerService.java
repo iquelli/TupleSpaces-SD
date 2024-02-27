@@ -76,7 +76,7 @@ public class NameServerService implements AutoCloseable {
 
         ChannelStubPair<TupleSpacesBlockingStub> channelAndStub =
                 this.channelStubPairMap.get(qualifier);
-        if (channelAndStub != null && !channelAndStub.channel().isShutdown()) {
+        if (channelAndStub != null && !channelAndStub.channel().isTerminated()) {
             return channelAndStub.stub(); // channel was already created, no need to create again
         }
 
