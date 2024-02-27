@@ -36,19 +36,8 @@ class ServiceEntry:
 
         self.servers.append(server_entry)
 
-    def search_for_servers(self, qualifier):
-        servers_list = []
-        if qualifier == "":
-            return self.servers
-
-        if not validate_qualifier(qualifier):
-            raise InvalidServerArgumentsException
-
-        servers_list.append(
-            server for server in self.servers if server.qualifier == qualifier
-        )
-
-        return servers_list
+    def get_servers(self):
+        return self.servers
 
     def remove_server(self, host, port):
         for server in self.servers:
@@ -108,16 +97,15 @@ class NameServerServiceImpl(pb2_grpc.NameServerServicer):
 
             servers = []
             if service_name in self.server.service_map:
-                servers = self.server.service_map[service_name].search_for_servers(
-                    qualifier
-                )
+                servers = self.server.service_map[service_name].get_servers()
 
             response = pb2.LookupResponse()
             for s in servers:
-                server_info = response.server.add()
-                server_info.address.host = s.host
-                server_info.address.port = s.port
-                server_info.qualifier = s.qualifier
+                if(s.qualifier == qualifier or qualifier == ""):
+                    server_info = response.server.add()
+                    server_info.address.host = s.host
+                    server_info.address.port = s.port
+                    server_info.qualifier = s.qualifier
 
             if len(servers) == 0:
                 logging.debug("Cannot resolve server with qualifier '%s'", qualifier)
