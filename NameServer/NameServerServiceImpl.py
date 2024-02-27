@@ -100,7 +100,7 @@ class NameServerServiceImpl(pb2_grpc.NameServerServicer):
             return pb2.RegisterResponse()
         except UnsuccessfulServerRegisterException:
             logging.debug("Not possible to register the server")
-            context.set_code(grpc.StatusCode.UNAVAILABLE)
+            context.set_code(grpc.StatusCode.ALREADY_EXISTS)
             context.set_details("Not possible to register the server")
             return pb2.RegisterResponse()
 
@@ -120,6 +120,13 @@ class NameServerServiceImpl(pb2_grpc.NameServerServicer):
                 server_info.address.host = s.host
                 server_info.address.port = s.port
                 server_info.qualifier = s.qualifier
+
+            if len(servers) == 0:
+                logging.debug("Cannot resolve server with qualifier '%s'", qualifier)
+                context.set_code(grpc.StatusCode.NOT_FOUND)
+                context.set_details(
+                    f"Cannot resolve server with qualifier '{qualifier}'"
+                )
             return response
         except InvalidServerArgumentsException:
             logging.debug("Server has invalid arguments")
@@ -139,6 +146,6 @@ class NameServerServiceImpl(pb2_grpc.NameServerServicer):
             return pb2.DeleteResponse()
         except UnsuccessfulServerDeleteException:
             logging.debug("Not possible to remove the server")
-            context.set_code(grpc.StatusCode.UNAVAILABLE)
+            context.set_code(grpc.StatusCode.NOT_FOUND)
             context.set_details("Not possible to remove the server")
             return pb2.DeleteResponse()

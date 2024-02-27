@@ -3,6 +3,8 @@ package pt.ulisboa.tecnico.tuplespaces.server;
 import io.grpc.BindableService;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
+import io.grpc.Status;
+import io.grpc.StatusRuntimeException;
 import pt.ulisboa.tecnico.tuplespaces.common.grpc.NameServerService;
 import pt.ulisboa.tecnico.tuplespaces.server.service.TupleSpacesCentralizedServiceImpl;
 
@@ -57,17 +59,19 @@ public class ServerMain {
 
         server.start();
         // Server threads are running in the background.
-        System.out.println("TupleSpaces server has started");
 
         try {
             nameServerService.register(port, qualifier);
-        } catch (Exception e) {
-            System.err.println(
-                    "Failed to register the server into the name server"
-            );
-            e.printStackTrace();
+        } catch (StatusRuntimeException e) {
+            if (e.getStatus().getCode() == Status.UNAVAILABLE.getCode()) {
+                System.out.println("Name server is unreachable");
+            } else {
+                System.out.println(e.getStatus().getDescription());
+            }
             System.exit(1);
         }
+
+        System.out.println("TupleSpaces server has started");
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             System.out.println("TupleSpaces server is shutting down");

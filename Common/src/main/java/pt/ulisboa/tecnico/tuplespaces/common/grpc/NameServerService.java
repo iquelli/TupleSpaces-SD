@@ -2,14 +2,13 @@ package pt.ulisboa.tecnico.tuplespaces.common.grpc;
 
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
-import pt.ulisboa.tecnico.tuplespaces.common.exceptions.ServerUnreachableException;
+import io.grpc.StatusRuntimeException;
 import pt.ulisboa.tecnico.tuplespaces.nameserver.contract.NameServerGrpc;
 import pt.ulisboa.tecnico.tuplespaces.nameserver.contract.NameServerOuterClass.DeleteRequest;
 import pt.ulisboa.tecnico.tuplespaces.nameserver.contract.NameServerOuterClass.LookupRequest;
 import pt.ulisboa.tecnico.tuplespaces.nameserver.contract.NameServerOuterClass.LookupResponse;
 import pt.ulisboa.tecnico.tuplespaces.nameserver.contract.NameServerOuterClass.RegisterRequest;
 import pt.ulisboa.tecnico.tuplespaces.nameserver.contract.NameServerOuterClass.ServerAddress;
-import pt.ulisboa.tecnico.tuplespaces.nameserver.contract.NameServerOuterClass.ServerInfo;
 
 
 public class NameServerService implements AutoCloseable {
@@ -29,7 +28,10 @@ public class NameServerService implements AutoCloseable {
         stub = NameServerGrpc.newBlockingStub(channel);
     }
 
-    public void register(int port, String qualifier) {
+    public void register(
+            int port,
+            String qualifier
+    ) throws StatusRuntimeException {
         stub.register(
                 RegisterRequest.newBuilder()
                         .setServiceName(SERVICE_NAME)
@@ -46,7 +48,7 @@ public class NameServerService implements AutoCloseable {
 
     public ServerAddress lookup(
             String qualifier
-    ) throws ServerUnreachableException {
+    ) throws StatusRuntimeException {
         LookupResponse response = stub.lookup(
                 LookupRequest.newBuilder()
                         .setServiceName(SERVICE_NAME)
@@ -55,25 +57,25 @@ public class NameServerService implements AutoCloseable {
         );
 
         // get list of servers
-        return response.getServerList()
-                .stream()
-                .findFirst()
-                .map(ServerInfo::getAddress)
-                .orElseThrow(() -> new ServerUnreachableException(qualifier));
+        return response.getServerList().get(0).getAddress();
     }
 
     public void delete(int port) {
-        stub.delete(
-                DeleteRequest.newBuilder()
-                        .setServiceName(SERVICE_NAME)
-                        .setAddress(
-                                ServerAddress.newBuilder()
-                                        .setHost(NAME_SERVER_HOST)
-                                        .setPort(port)
-                                        .build()
-                        )
-                        .build()
-        );
+        try {
+            stub.delete(
+                    DeleteRequest.newBuilder()
+                            .setServiceName(SERVICE_NAME)
+                            .setAddress(
+                                    ServerAddress.newBuilder()
+                                            .setHost(NAME_SERVER_HOST)
+                                            .setPort(port)
+                                            .build()
+                            )
+                            .build()
+            );
+        } catch (StatusRuntimeException e) {
+            // do nothing
+        }
     }
 
     @Override

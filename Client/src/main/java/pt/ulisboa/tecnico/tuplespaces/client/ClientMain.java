@@ -1,13 +1,16 @@
 package pt.ulisboa.tecnico.tuplespaces.client;
 
+import io.grpc.Status;
+import io.grpc.StatusRuntimeException;
 import pt.ulisboa.tecnico.tuplespaces.client.grpc.ClientService;
-import pt.ulisboa.tecnico.tuplespaces.common.exceptions.ServerUnreachableException;
 import pt.ulisboa.tecnico.tuplespaces.common.grpc.NameServerService;
 import pt.ulisboa.tecnico.tuplespaces.nameserver.contract.NameServerOuterClass.ServerAddress;
 
 public class ClientMain {
 
     public static void main(String[] args) {
+        System.out.println(ClientMain.class.getSimpleName());
+
         // Check arguments
         if (args.length != 0) {
             System.err.println("Too many arguments!");
@@ -16,8 +19,9 @@ public class ClientMain {
         }
 
         final NameServerService nameServerService = new NameServerService();
-        // There is only one server now
-        String qualifier = ""; // so, no qualifier will give us the only server available
+        // There is only one server now, therefore empty qualifier will give us
+        // the only server available
+        String qualifier = "";
 
         try {
             ServerAddress server = nameServerService.lookup(qualifier);
@@ -29,8 +33,12 @@ public class ClientMain {
                 CommandProcessor parser = new CommandProcessor(clientService);
                 parser.parseInput();
             }
-        } catch (ServerUnreachableException e) {
-            System.err.println("Could not resolve a server!");
+        } catch (StatusRuntimeException e) {
+            if (e.getStatus().getCode() == Status.UNAVAILABLE.getCode()) {
+                System.out.println("Name server is unreachable");
+            } else {
+                System.out.println(e.getStatus().getDescription());
+            }
             nameServerService.close();
         }
 
