@@ -100,14 +100,16 @@ class NameServerServiceImpl(pb2_grpc.NameServerServicer):
                 servers = self.server.service_map[service_name].get_servers()
 
             response = pb2.LookupResponse()
+            added_server = False
             for s in servers:
                 if(s.qualifier == qualifier or qualifier == ""):
+                    added_server = True
                     server_info = response.server.add()
                     server_info.address.host = s.host
                     server_info.address.port = s.port
                     server_info.qualifier = s.qualifier
 
-            if len(servers) == 0:
+            if len(servers) == 0 or not added_server:
                 logging.debug("Cannot resolve server with qualifier '%s'", qualifier)
                 context.set_code(grpc.StatusCode.NOT_FOUND)
                 context.set_details(
