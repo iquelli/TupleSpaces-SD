@@ -1,8 +1,8 @@
 package pt.ulisboa.tecnico.tuplespaces.client;
 
 import pt.ulisboa.tecnico.tuplespaces.client.grpc.ClientService;
-import pt.ulisboa.tecnico.tuplespaces.common.grpc.NameServerService;
 import pt.ulisboa.tecnico.tuplespaces.common.Logger;
+import pt.ulisboa.tecnico.tuplespaces.common.grpc.NameServerService;
 
 public class ClientMain {
 
@@ -18,16 +18,12 @@ public class ClientMain {
 
         final NameServerService nameServerService = new NameServerService();
 
-
-
-        try (var clientService = new ClientService(nameServerService)
-        ) {
+        try (var clientService = new ClientService(nameServerService)) {
             CommandProcessor parser = new CommandProcessor(clientService);
             parser.parseInput();
         }
 
         nameServerService.close();
-
     }
 
 }

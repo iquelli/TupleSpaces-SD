@@ -8,7 +8,8 @@ public final class Logger {
     private static final AtomicBoolean debugFlag =
             new AtomicBoolean(System.getProperty("debug") != null);
 
-    private Logger() {}
+    private Logger() {
+    }
 
 
     public static void setDebugFlag(boolean flag) {
@@ -24,7 +25,8 @@ public final class Logger {
     }
 
     public static void error(String errorMessage, Object... args) {
-            String formattedMessage = String.format(errorMessage, args);
-            System.err.println(formattedMessage);
+        String formattedMessage = String.format(errorMessage, args);
+        System.err.println(formattedMessage);
     }
+
 }

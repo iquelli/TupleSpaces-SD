@@ -11,9 +11,9 @@ import pt.ulisboa.tecnico.tuplespaces.centralized.contract.TupleSpacesCentralize
 import pt.ulisboa.tecnico.tuplespaces.centralized.contract.TupleSpacesCentralized.getTupleSpacesStateRequest;
 import pt.ulisboa.tecnico.tuplespaces.centralized.contract.TupleSpacesCentralized.getTupleSpacesStateResponse;
 import pt.ulisboa.tecnico.tuplespaces.centralized.contract.TupleSpacesGrpc;
+import pt.ulisboa.tecnico.tuplespaces.common.Logger;
 import pt.ulisboa.tecnico.tuplespaces.server.domain.ServerState;
 import pt.ulisboa.tecnico.tuplespaces.server.exceptions.InvalidTupleException;
-import pt.ulisboa.tecnico.tuplespaces.common.Logger;
 
 import java.util.List;
 
@@ -140,7 +140,10 @@ public class TupleSpacesCentralizedServiceImpl extends TupleSpacesGrpc.TupleSpac
             StreamObserver<getTupleSpacesStateResponse> responseObserver
     ) {
         try {
-            Logger.debug("[INFO] Received GET_TUPLE_SPACE_STATE request:%n%s", request);
+            Logger.debug(
+                    "[INFO] Received GET_TUPLE_SPACE_STATE request:%n%s",
+                    request
+            );
             // Get the tuples from the space state
             List<String> tuples = state.getTupleSpacesState();
 
@@ -154,8 +157,10 @@ public class TupleSpacesCentralizedServiceImpl extends TupleSpacesGrpc.TupleSpac
             responseObserver.onNext(response);
             responseObserver.onCompleted();
         } catch (RuntimeException e) {
-            Logger.debug("[ERR] GET_TUPLE_SPACE_STATE operation failed:%s",
-                    e.getMessage());
+            Logger.debug(
+                    "[ERR] GET_TUPLE_SPACE_STATE operation failed:%s",
+                    e.getMessage()
+            );
             responseObserver.onError(
                     Status.UNKNOWN.withDescription(e.getMessage())
                             .asRuntimeException()

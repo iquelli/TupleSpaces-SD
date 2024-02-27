@@ -19,7 +19,7 @@ public class ClientService extends TupleSpacesGrpc.TupleSpacesImplBase implement
     NameServerService nameServerService;
     // For commands that don't specify a qualifier
     // The empty qualifier will return all servers available
-    String default_qualifier = "";
+    String defaultQualifier = "";
 
     public ClientService(NameServerService nameServerService) {
         this.nameServerService = nameServerService;
@@ -27,14 +27,14 @@ public class ClientService extends TupleSpacesGrpc.TupleSpacesImplBase implement
 
     public void put(String newTuple) throws StatusRuntimeException {
         TupleSpacesBlockingStub stub = nameServerService.connectToServer(
-                default_qualifier
+                defaultQualifier
         );
         stub.put(PutRequest.newBuilder().setNewTuple(newTuple).build());
     }
 
     public String read(String searchPattern) throws StatusRuntimeException {
         TupleSpacesBlockingStub stub = nameServerService.connectToServer(
-                default_qualifier
+                defaultQualifier
         );
         ReadResponse response = stub.read(
                 ReadRequest.newBuilder().setSearchPattern(searchPattern).build()
@@ -45,7 +45,7 @@ public class ClientService extends TupleSpacesGrpc.TupleSpacesImplBase implement
 
     public String take(String searchPattern) throws StatusRuntimeException {
         TupleSpacesBlockingStub stub = nameServerService.connectToServer(
-                default_qualifier
+                defaultQualifier
         );
         TakeResponse response = stub.take(
                 TakeRequest.newBuilder().setSearchPattern(searchPattern).build()

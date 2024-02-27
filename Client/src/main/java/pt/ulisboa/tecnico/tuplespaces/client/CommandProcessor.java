@@ -37,7 +37,6 @@ public class CommandProcessor {
             String[] split = line.split(SPACE);
 
             try {
-
                 switch (split[0]) {
                     case PUT:
                         this.put(split);
@@ -148,7 +147,9 @@ public class CommandProcessor {
                 System.out.println(tuple);
             }
         } else {
-            System.out.println("No tuples in server with qualifier: " + qualifier);
+            System.out.println(
+                    "No tuples in server with qualifier: " + qualifier
+            );
         }
     }
 

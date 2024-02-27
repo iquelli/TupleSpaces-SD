@@ -22,7 +22,7 @@ if __name__ == "__main__":
 
         # Setup logger
         parser = argparse.ArgumentParser()
-        parser.add_argument("-log", default="INFO")
+        parser.add_argument("-log", default="WARNING")
         logging.basicConfig(
             format="[%(levelname)s]: %(message)s",
             level=parser.parse_args().log.upper(),

@@ -5,13 +5,13 @@ import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;
 import pt.ulisboa.tecnico.tuplespaces.centralized.contract.TupleSpacesGrpc;
 import pt.ulisboa.tecnico.tuplespaces.centralized.contract.TupleSpacesGrpc.TupleSpacesBlockingStub;
+import pt.ulisboa.tecnico.tuplespaces.common.Logger;
 import pt.ulisboa.tecnico.tuplespaces.nameserver.contract.NameServerGrpc;
 import pt.ulisboa.tecnico.tuplespaces.nameserver.contract.NameServerOuterClass.DeleteRequest;
 import pt.ulisboa.tecnico.tuplespaces.nameserver.contract.NameServerOuterClass.LookupRequest;
 import pt.ulisboa.tecnico.tuplespaces.nameserver.contract.NameServerOuterClass.LookupResponse;
 import pt.ulisboa.tecnico.tuplespaces.nameserver.contract.NameServerOuterClass.RegisterRequest;
 import pt.ulisboa.tecnico.tuplespaces.nameserver.contract.NameServerOuterClass.ServerAddress;
-import pt.ulisboa.tecnico.tuplespaces.common.Logger;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -22,7 +22,6 @@ public class NameServerService implements AutoCloseable {
     private static final String NAME_SERVER_HOST = "localhost";
     private static final int NAME_SERVER_PORT = 5001;
     private static final String SERVICE_NAME = "TupleSpaces";
-
 
     private final ManagedChannel channel;
     private final NameServerGrpc.NameServerBlockingStub stub;
@@ -74,10 +73,10 @@ public class NameServerService implements AutoCloseable {
     public TupleSpacesBlockingStub connectToServer(
             String qualifier
     ) throws StatusRuntimeException {
-
         ChannelStubPair<TupleSpacesBlockingStub> channelAndStub =
                 this.channelStubPairMap.get(qualifier);
-        if (channelAndStub != null && !channelAndStub.channel().isTerminated()) {
+        if (channelAndStub != null && !channelAndStub.channel()
+                .isTerminated()) {
             return channelAndStub.stub(); // channel was already created, no need to create again
         }
 
@@ -87,7 +86,8 @@ public class NameServerService implements AutoCloseable {
         int port = address.getPort();
 
         Logger.debug(
-                "Establishing connection to server " + qualifier + " at " + host + ":" + port
+                "Establishing connection to server " + qualifier + " at " +
+                        host + ":" + port
         );
 
         ManagedChannel channel = ManagedChannelBuilder.forAddress(host, port)
@@ -131,9 +131,7 @@ public class NameServerService implements AutoCloseable {
         this.channelStubPairMap.clear();
     }
 
-    public record ChannelStubPair<T>(
-            ManagedChannel channel, TupleSpacesBlockingStub stub
-    ) {
+    public record ChannelStubPair<T>(ManagedChannel channel, T stub) {
     }
 
 }
