@@ -51,16 +51,11 @@ class ServiceEntry:
         return servers_list
 
     def remove_server(self, host, port):
-        try:
-            self.servers.remove(
-                next(
-                    server
-                    for server in self.servers
-                    if server.host == host and server.port == port
-                )
-            )
-        except StopIteration:
-            raise UnsuccessfulServerDeleteException
+        for server in self.servers:
+            if server.host == host and server.port == port:
+                self.servers.remove(server)
+                return
+        raise UnsuccessfulServerDeleteException
 
 
 # This class is responsible for mapping a service name to its

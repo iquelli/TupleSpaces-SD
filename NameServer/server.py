@@ -17,7 +17,7 @@ if __name__ == "__main__":
     try:
         if len(sys.argv) > 2:
             print("Too many arguments passed!")
-            print("Usage: python ./server.py [-log=<log_level]")
+            print("Usage: python ./server.py [-log=<log_level>]")
             exit(1)
 
         # Setup logger
