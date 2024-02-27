@@ -63,7 +63,7 @@ public class ServerMain {
         try {
             nameServerService.register(port, qualifier);
         } catch (StatusRuntimeException e) {
-            if (e.getStatus().getCode() == Status.UNAVAILABLE.getCode()) {
+            if (e.getStatus().getCode() == Status.Code.UNAVAILABLE) {
                 System.out.println("Name server is unreachable");
             } else {
                 System.out.println(e.getStatus().getDescription());

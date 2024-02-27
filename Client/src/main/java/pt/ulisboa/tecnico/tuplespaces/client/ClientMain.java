@@ -34,14 +34,19 @@ public class ClientMain {
                 parser.parseInput();
             }
         } catch (StatusRuntimeException e) {
-            if (e.getStatus().getCode() == Status.UNAVAILABLE.getCode()) {
-                System.out.println("Name server is unreachable");
-            } else {
+            if (e.getStatus().getCode() == Status.Code.UNAVAILABLE) {
+                System.out.println("Failed to estabilish connection to server");
+            } else if (e.getStatus().getDescription() != null) {
                 System.out.println(e.getStatus().getDescription());
+            } else {
+                System.err.println("gRCP Error: " + e.getMessage());
             }
-            nameServerService.close();
+        } catch (Exception e) {
+            System.err.println(
+                    "An unexpected error occurred: " + e.getMessage()
+            );
         }
-
+        nameServerService.close();
     }
 
 }

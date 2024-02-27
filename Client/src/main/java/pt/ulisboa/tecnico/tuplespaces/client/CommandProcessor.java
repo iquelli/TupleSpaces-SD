@@ -1,6 +1,5 @@
 package pt.ulisboa.tecnico.tuplespaces.client;
 
-import io.grpc.StatusRuntimeException;
 import pt.ulisboa.tecnico.tuplespaces.client.grpc.ClientService;
 
 import java.util.List;
@@ -34,45 +33,31 @@ public class CommandProcessor {
             String line = scanner.nextLine().trim();
             String[] split = line.split(SPACE);
 
-            try {
-                switch (split[0]) {
-                    case PUT:
-                        this.put(split);
-                        break;
-                    case READ:
-                        this.read(split);
-                        break;
-                    case TAKE:
-                        this.take(split);
-                        break;
-                    case GET_TUPLE_SPACES_STATE:
-                        this.getTupleSpacesState(split);
-                        break;
-                    case SLEEP:
-                        this.sleep(split);
-                        break;
-                    case SET_DELAY:
-                        this.setdelay(split);
-                        break;
-                    case EXIT:
-                        exit = true;
-                        break;
-                    default:
-                        this.printUsage();
-                        break;
-                }
-            } catch (StatusRuntimeException e) {
-                if (e.getStatus().getDescription() != null) {
-                    System.err.println(
-                            e.getStatus().getDescription()
-                    );
-                } else {
-                    System.err.println("gRCP Error: " + e.getMessage());
-                }
-            } catch (Exception e) {
-                System.err.println(
-                        "An unexpected error occurred: " + e.getMessage()
-                );
+            switch (split[0]) {
+                case PUT:
+                    this.put(split);
+                    break;
+                case READ:
+                    this.read(split);
+                    break;
+                case TAKE:
+                    this.take(split);
+                    break;
+                case GET_TUPLE_SPACES_STATE:
+                    this.getTupleSpacesState(split);
+                    break;
+                case SLEEP:
+                    this.sleep(split);
+                    break;
+                case SET_DELAY:
+                    this.setdelay(split);
+                    break;
+                case EXIT:
+                    exit = true;
+                    break;
+                default:
+                    this.printUsage();
+                    break;
             }
         }
         scanner.close();
