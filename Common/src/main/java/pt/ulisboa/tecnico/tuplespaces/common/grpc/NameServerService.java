@@ -120,7 +120,7 @@ public class NameServerService implements AutoCloseable {
                             .build()
             );
         } catch (StatusRuntimeException e) {
-            Logger.debug("[ERR] Delete went wrong:%s", e.getMessage());
+            Logger.debug("[ERR] %s", e.getMessage());
         }
     }
 
