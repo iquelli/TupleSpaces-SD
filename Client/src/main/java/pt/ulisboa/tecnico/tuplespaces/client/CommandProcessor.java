@@ -141,8 +141,13 @@ public class CommandProcessor {
                 qualifier
         );
         System.out.println("OK");
-        for (String tuple : tupleList) {
-            System.out.println(tuple);
+
+        if (tupleList != null && !tupleList.isEmpty()) {
+            for (String tuple : tupleList) {
+                System.out.println(tuple);
+            }
+        } else {
+            System.out.println("No tuples in server with qualifier: " + qualifier);
         }
     }
 
