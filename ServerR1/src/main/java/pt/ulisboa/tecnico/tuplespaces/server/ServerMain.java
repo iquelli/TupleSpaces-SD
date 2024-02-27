@@ -7,25 +7,26 @@ import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import pt.ulisboa.tecnico.tuplespaces.common.grpc.NameServerService;
 import pt.ulisboa.tecnico.tuplespaces.server.service.TupleSpacesCentralizedServiceImpl;
+import pt.ulisboa.tecnico.tuplespaces.common.Logger;
 
 import java.util.OptionalInt;
 
 public class ServerMain {
 
     public static void main(String[] args) throws Exception {
-        // TODO: add proper logging
-        System.out.println(ServerMain.class.getSimpleName());
+
+        Logger.debug(ServerMain.class.getSimpleName() + " started");
 
         // Receive and print arguments
-        System.out.printf("Received %d arguments%n", args.length);
+        Logger.debug("Received %d arguments", args.length);
         for (int i = 0; i < args.length; i++) {
-            System.out.printf("arg[%d] = %s%n", i, args[i]);
+            Logger.debug("arg[%d] = %s", i, args[i]);
         }
 
         // Check number of arguments
         if (args.length != 2) {
-            System.err.println("Wrong number of arguments!");
-            System.err.println(
+            Logger.error("Wrong number of arguments!");
+            Logger.error(
                     "Usage: mvn exec:java -Dexec.args=\"<port> <qualifier>\""
             );
             System.exit(1);
@@ -33,8 +34,11 @@ public class ServerMain {
 
         final OptionalInt optPort = parsePort(args[0]);
         if (optPort.isEmpty()) {
-            System.err.println(
+            Logger.error(
                     "The port number must be an integer between 1024 and 65535"
+            );
+            Logger.error(
+                    "Usage: mvn exec:java -Dexec.args=\"<port> <qualifier>\""
             );
             System.exit(1);
         }
@@ -42,7 +46,10 @@ public class ServerMain {
 
         final String qualifier = args[1];
         if (qualifier == null || qualifier.isEmpty()) {
-            System.err.println("The qualifier must be a non-empty string");
+            Logger.error("The qualifier must be a non-empty string");
+            Logger.error(
+                    "Usage: mvn exec:java -Dexec.args=\"<port> <qualifier>\""
+            );
             System.exit(1);
         }
 
@@ -57,8 +64,8 @@ public class ServerMain {
             // Server threads are running in the background.
             server.start();
         } catch (Exception e) {
-            System.err.println(
-                    "Failed to start server to listen on port " + args[0]
+            Logger.error(
+                    "Failed to start server to listen on port %s" + args[0]
             );
             System.exit(1);
         }
@@ -67,17 +74,17 @@ public class ServerMain {
             nameServerService.register(port, qualifier);
         } catch (StatusRuntimeException e) {
             if (e.getStatus().getCode() == Status.Code.UNAVAILABLE) {
-                System.out.println("Name server is unreachable");
+                Logger.error("Name server is unreachable");
             } else {
-                System.out.println(e.getStatus().getDescription());
+                Logger.error(e.getStatus().getDescription());
             }
             System.exit(1);
         }
 
-        System.out.println("TupleSpaces server has started");
+        Logger.debug("TupleSpaces server has started%n");
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            System.out.println("TupleSpaces server is shutting down");
+            Logger.debug("TupleSpaces server is shutting down");
             nameServerService.delete(port);
             nameServerService.close();
         }));

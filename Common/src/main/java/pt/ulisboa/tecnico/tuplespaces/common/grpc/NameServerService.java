@@ -11,6 +11,7 @@ import pt.ulisboa.tecnico.tuplespaces.nameserver.contract.NameServerOuterClass.L
 import pt.ulisboa.tecnico.tuplespaces.nameserver.contract.NameServerOuterClass.LookupResponse;
 import pt.ulisboa.tecnico.tuplespaces.nameserver.contract.NameServerOuterClass.RegisterRequest;
 import pt.ulisboa.tecnico.tuplespaces.nameserver.contract.NameServerOuterClass.ServerAddress;
+import pt.ulisboa.tecnico.tuplespaces.common.Logger;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -85,8 +86,8 @@ public class NameServerService implements AutoCloseable {
         String host = address.getHost();
         int port = address.getPort();
 
-        System.out.println(
-                "Connecting to server " + qualifier + " at " + host + ":" + port
+        Logger.debug(
+                "Establishing connection to server " + qualifier + " at " + host + ":" + port
         );
 
         ManagedChannel channel = ManagedChannelBuilder.forAddress(host, port)
@@ -94,7 +95,7 @@ public class NameServerService implements AutoCloseable {
                 .build();
         TupleSpacesBlockingStub stub = TupleSpacesGrpc.newBlockingStub(channel);
 
-        System.out.println(
+        Logger.debug(
                 "Connected to server " + qualifier + " at " + host + ":" + port
         );
 
@@ -119,7 +120,7 @@ public class NameServerService implements AutoCloseable {
                             .build()
             );
         } catch (StatusRuntimeException e) {
-            // do nothing
+            Logger.debug("[ERR] Delete went wrong:%s", e.getMessage());
         }
     }
 

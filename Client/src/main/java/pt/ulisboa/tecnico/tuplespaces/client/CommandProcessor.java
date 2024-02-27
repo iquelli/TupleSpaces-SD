@@ -3,6 +3,7 @@ package pt.ulisboa.tecnico.tuplespaces.client;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import pt.ulisboa.tecnico.tuplespaces.client.grpc.ClientService;
+import pt.ulisboa.tecnico.tuplespaces.common.Logger;
 
 import java.util.List;
 import java.util.Scanner;
@@ -65,16 +66,16 @@ public class CommandProcessor {
                 }
             } catch (StatusRuntimeException e) {
                 if (e.getStatus().getCode() == Status.Code.UNAVAILABLE) {
-                    System.out.println(
-                            "Failed to estabilish connection to server"
+                    Logger.error(
+                            "Failed to establish connection to server"
                     );
                 } else if (e.getStatus().getDescription() != null) {
-                    System.out.println(e.getStatus().getDescription());
+                    Logger.error(e.getStatus().getDescription());
                 } else {
-                    System.err.println("gRCP Error: " + e.getMessage());
+                    Logger.error("gRCP Error: " + e.getMessage());
                 }
             } catch (Exception e) {
-                System.err.println(
+                Logger.error(
                         "An unexpected error occurred: " + e.getMessage()
                 );
             }

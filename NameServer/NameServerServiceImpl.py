@@ -102,12 +102,13 @@ class NameServerServiceImpl(pb2_grpc.NameServerServicer):
             response = pb2.LookupResponse()
             added_server = False
             for s in servers:
-                if(s.qualifier == qualifier or qualifier == ""):
+                if s.qualifier == qualifier or qualifier == "":
                     added_server = True
                     server_info = response.server.add()
                     server_info.address.host = s.host
                     server_info.address.port = s.port
                     server_info.qualifier = s.qualifier
+                    logging.info("Fetched server -> %s:%s %s", s.host, s.port, s.qualifier)
 
             if len(servers) == 0 or not added_server:
                 logging.debug("Cannot resolve server with qualifier '%s'", qualifier)
