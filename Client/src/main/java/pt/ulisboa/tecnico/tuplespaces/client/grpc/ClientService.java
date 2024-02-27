@@ -1,7 +1,5 @@
 package pt.ulisboa.tecnico.tuplespaces.client.grpc;
 
-import io.grpc.ManagedChannel;
-import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;
 import pt.ulisboa.tecnico.tuplespaces.centralized.contract.TupleSpacesCentralized.PutRequest;
 import pt.ulisboa.tecnico.tuplespaces.centralized.contract.TupleSpacesCentralized.ReadRequest;
@@ -11,27 +9,33 @@ import pt.ulisboa.tecnico.tuplespaces.centralized.contract.TupleSpacesCentralize
 import pt.ulisboa.tecnico.tuplespaces.centralized.contract.TupleSpacesCentralized.getTupleSpacesStateRequest;
 import pt.ulisboa.tecnico.tuplespaces.centralized.contract.TupleSpacesCentralized.getTupleSpacesStateResponse;
 import pt.ulisboa.tecnico.tuplespaces.centralized.contract.TupleSpacesGrpc;
+import pt.ulisboa.tecnico.tuplespaces.centralized.contract.TupleSpacesGrpc.TupleSpacesBlockingStub;
+import pt.ulisboa.tecnico.tuplespaces.common.grpc.NameServerService;
 
 import java.util.List;
 
 public class ClientService extends TupleSpacesGrpc.TupleSpacesImplBase implements AutoCloseable {
 
-    private final ManagedChannel channel;
-    // Blocking stub for variant R1
-    private final TupleSpacesGrpc.TupleSpacesBlockingStub stub;
+    NameServerService nameServerService;
+    // For commands that don't specify a qualifier
+    // The empty qualifier will return all servers available
+    String default_qualifier = "";
 
-    public ClientService(String host, String port) {
-        channel = ManagedChannelBuilder.forTarget(host + ":" + port)
-                .usePlaintext()
-                .build();
-        stub = TupleSpacesGrpc.newBlockingStub(channel);
+    public ClientService(NameServerService nameServerService) {
+        this.nameServerService = nameServerService;
     }
 
     public void put(String newTuple) throws StatusRuntimeException {
+        TupleSpacesBlockingStub stub = nameServerService.connectToServer(
+                default_qualifier
+        );
         stub.put(PutRequest.newBuilder().setNewTuple(newTuple).build());
     }
 
     public String read(String searchPattern) throws StatusRuntimeException {
+        TupleSpacesBlockingStub stub = nameServerService.connectToServer(
+                default_qualifier
+        );
         ReadResponse response = stub.read(
                 ReadRequest.newBuilder().setSearchPattern(searchPattern).build()
         );
@@ -40,6 +44,9 @@ public class ClientService extends TupleSpacesGrpc.TupleSpacesImplBase implement
     }
 
     public String take(String searchPattern) throws StatusRuntimeException {
+        TupleSpacesBlockingStub stub = nameServerService.connectToServer(
+                default_qualifier
+        );
         TakeResponse response = stub.take(
                 TakeRequest.newBuilder().setSearchPattern(searchPattern).build()
         );
@@ -50,7 +57,9 @@ public class ClientService extends TupleSpacesGrpc.TupleSpacesImplBase implement
     public List<String> getTupleSpacesState(
             String qualifier
     ) throws StatusRuntimeException {
-        // TODO: need name server logic to implement qualifier
+        TupleSpacesBlockingStub stub = nameServerService.connectToServer(
+                qualifier
+        );
         getTupleSpacesStateResponse response = stub.getTupleSpacesState(
                 getTupleSpacesStateRequest.newBuilder().build()
         );
@@ -60,7 +69,6 @@ public class ClientService extends TupleSpacesGrpc.TupleSpacesImplBase implement
 
     @Override
     public void close() { // for autocloseable
-        channel.shutdown();
     }
 
 }

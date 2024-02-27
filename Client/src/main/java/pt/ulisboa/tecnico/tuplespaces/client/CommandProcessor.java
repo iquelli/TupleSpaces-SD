@@ -1,5 +1,7 @@
 package pt.ulisboa.tecnico.tuplespaces.client;
 
+import io.grpc.Status;
+import io.grpc.StatusRuntimeException;
 import pt.ulisboa.tecnico.tuplespaces.client.grpc.ClientService;
 
 import java.util.List;
@@ -33,31 +35,48 @@ public class CommandProcessor {
             String line = scanner.nextLine().trim();
             String[] split = line.split(SPACE);
 
-            switch (split[0]) {
-                case PUT:
-                    this.put(split);
-                    break;
-                case READ:
-                    this.read(split);
-                    break;
-                case TAKE:
-                    this.take(split);
-                    break;
-                case GET_TUPLE_SPACES_STATE:
-                    this.getTupleSpacesState(split);
-                    break;
-                case SLEEP:
-                    this.sleep(split);
-                    break;
-                case SET_DELAY:
-                    this.setdelay(split);
-                    break;
-                case EXIT:
-                    exit = true;
-                    break;
-                default:
-                    this.printUsage();
-                    break;
+            try {
+
+                switch (split[0]) {
+                    case PUT:
+                        this.put(split);
+                        break;
+                    case READ:
+                        this.read(split);
+                        break;
+                    case TAKE:
+                        this.take(split);
+                        break;
+                    case GET_TUPLE_SPACES_STATE:
+                        this.getTupleSpacesState(split);
+                        break;
+                    case SLEEP:
+                        this.sleep(split);
+                        break;
+                    case SET_DELAY:
+                        this.setdelay(split);
+                        break;
+                    case EXIT:
+                        exit = true;
+                        break;
+                    default:
+                        this.printUsage();
+                        break;
+                }
+            } catch (StatusRuntimeException e) {
+                if (e.getStatus().getCode() == Status.Code.UNAVAILABLE) {
+                    System.out.println(
+                            "Failed to estabilish connection to server"
+                    );
+                } else if (e.getStatus().getDescription() != null) {
+                    System.out.println(e.getStatus().getDescription());
+                } else {
+                    System.err.println("gRCP Error: " + e.getMessage());
+                }
+            } catch (Exception e) {
+                System.err.println(
+                        "An unexpected error occurred: " + e.getMessage()
+                );
             }
         }
         scanner.close();
@@ -184,8 +203,7 @@ public class CommandProcessor {
 
     private boolean inputIsValid(String[] input) {
         if (input.length < 2 || !input[1].startsWith(BGN_TUPLE) || !input[1]
-                .endsWith(END_TUPLE) || input.length > 2
-        ) {
+                .endsWith(END_TUPLE) || input.length > 2) {
             this.printUsage();
             return false;
         } else {
