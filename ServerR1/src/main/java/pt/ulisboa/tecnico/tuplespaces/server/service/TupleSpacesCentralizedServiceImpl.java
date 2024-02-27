@@ -141,7 +141,7 @@ public class TupleSpacesCentralizedServiceImpl extends TupleSpacesGrpc.TupleSpac
     ) {
         try {
             Logger.debug(
-                    "[INFO] Received GET_TUPLE_SPACE_STATE request:%n%s",
+                    "[INFO] Received GET_TUPLE_SPACE_STATE request%n",
                     request
             );
             // Get the tuples from the space state
