@@ -14,7 +14,7 @@ import pt.ulisboa.tecnico.tuplespaces.common.grpc.NameServerService;
 
 import java.util.List;
 
-public class ClientService extends TupleSpacesGrpc.TupleSpacesImplBase implements AutoCloseable {
+public class ClientService extends TupleSpacesGrpc.TupleSpacesImplBase {
 
     NameServerService nameServerService;
     // For commands that don't specify a qualifier
@@ -57,10 +57,6 @@ public class ClientService extends TupleSpacesGrpc.TupleSpacesImplBase implement
         );
 
         return response.getTupleList();
-    }
-
-    @Override
-    public void close() { // for autocloseable
     }
 
 }
