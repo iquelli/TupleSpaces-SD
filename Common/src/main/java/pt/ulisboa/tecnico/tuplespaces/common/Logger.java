@@ -29,4 +29,9 @@ public final class Logger {
         System.err.println(formattedMessage);
     }
 
+    public static void info(String infoMessage, Object... args) {
+        String formattedMessage = String.format(infoMessage, args);
+        System.out.println(formattedMessage);
+    }
+
 }

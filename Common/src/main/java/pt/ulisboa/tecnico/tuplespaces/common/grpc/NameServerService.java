@@ -10,6 +10,8 @@ import pt.ulisboa.tecnico.tuplespaces.nameserver.contract.NameServerGrpc;
 import pt.ulisboa.tecnico.tuplespaces.nameserver.contract.NameServerOuterClass.DeleteRequest;
 import pt.ulisboa.tecnico.tuplespaces.nameserver.contract.NameServerOuterClass.LookupRequest;
 import pt.ulisboa.tecnico.tuplespaces.nameserver.contract.NameServerOuterClass.LookupResponse;
+import pt.ulisboa.tecnico.tuplespaces.nameserver.contract.NameServerOuterClass.PingRequest;
+import pt.ulisboa.tecnico.tuplespaces.nameserver.contract.NameServerOuterClass.PingResponse;
 import pt.ulisboa.tecnico.tuplespaces.nameserver.contract.NameServerOuterClass.RegisterRequest;
 import pt.ulisboa.tecnico.tuplespaces.nameserver.contract.NameServerOuterClass.ServerAddress;
 
@@ -70,14 +72,27 @@ public class NameServerService implements AutoCloseable {
         return response.getServerList().get(0).getAddress();
     }
 
-    public TupleSpacesBlockingStub connectToServer(
-            String qualifier
-    ) throws StatusRuntimeException {
-        ChannelStubPair<TupleSpacesBlockingStub> channelAndStub =
-                this.channelStubPairMap.get(qualifier);
-        if (channelAndStub != null && !channelAndStub.channel()
-                .isTerminated()) {
-            return channelAndStub.stub(); // channel was already created, no need to create again
+    public Boolean ping(String qualifier) {
+        PingResponse response = stub.ping(
+                PingRequest.newBuilder()
+                        .setQualifier(qualifier)
+                        .setServiceName(SERVICE_NAME)
+                        .build()
+        );
+        return response.getAnswer();
+    }
+
+    public TupleSpacesBlockingStub connectToServer(String qualifier) throws StatusRuntimeException {
+
+        ChannelStubPair<TupleSpacesBlockingStub> channelAndStub = this.channelStubPairMap.get(
+                qualifier
+        );
+
+        if (channelAndStub != null && !channelAndStub.channel().isTerminated()) {
+            if (ping(qualifier)) {
+                return channelAndStub.stub(); // channel was already created, no need to create again
+            }
+            this.channelStubPairMap.remove(qualifier);
         }
 
         // To connect to server

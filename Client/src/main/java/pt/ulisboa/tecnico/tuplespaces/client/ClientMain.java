@@ -7,7 +7,7 @@ import pt.ulisboa.tecnico.tuplespaces.common.grpc.NameServerService;
 public class ClientMain {
 
     public static void main(String[] args) {
-        System.out.println("Hello Client!");
+        Logger.info("Hello Client!");
 
         // Check arguments
         if (args.length != 0) {
@@ -18,12 +18,16 @@ public class ClientMain {
 
         final NameServerService nameServerService = new NameServerService();
 
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            Logger.info("Goodbye Client :c");
+            nameServerService.close();
+        }));
+
         try (var clientService = new ClientService(nameServerService)) {
             CommandProcessor parser = new CommandProcessor(clientService);
             parser.parseInput();
         }
 
-        nameServerService.close();
     }
 
 }

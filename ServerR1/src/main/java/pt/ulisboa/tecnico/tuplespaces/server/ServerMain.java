@@ -82,10 +82,10 @@ public class ServerMain {
             System.exit(1);
         }
 
-        Logger.debug("TupleSpaces server has started%n");
+        Logger.info("TupleSpaces server has started%n");
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            Logger.debug("TupleSpaces server is shutting down");
+            Logger.info("TupleSpaces server is shutting down");
             nameServerService.delete(port);
             nameServerService.close();
         }));

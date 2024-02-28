@@ -36,6 +36,17 @@ class ServiceEntry:
 
         self.servers.append(server_entry)
 
+    def search_for_servers(self, qualifier):
+
+        if not validate_qualifier(qualifier):
+            raise InvalidServerArgumentsException
+        
+        for server in self.servers:
+            if server.qualifier == qualifier:
+                return True
+        
+        return False
+
     def get_servers(self):
         return self.servers
 
@@ -109,7 +120,7 @@ class NameServerServiceImpl(pb2_grpc.NameServerServicer):
                     server_info.address.port = s.port
                     server_info.qualifier = s.qualifier
 
-            if len(servers) == 0 or not added_server:
+            if not added_server:
                 logging.debug("Cannot resolve server with qualifier '%s'", qualifier)
                 context.set_code(grpc.StatusCode.NOT_FOUND)
                 context.set_details(
@@ -138,3 +149,24 @@ class NameServerServiceImpl(pb2_grpc.NameServerServicer):
             context.set_code(grpc.StatusCode.NOT_FOUND)
             context.set_details("Not possible to remove the server")
             return pb2.DeleteResponse()
+        
+    def ping(self, request, context):
+        try:
+            logging.info("Receiving ping request:\n" + str(request))
+            qualifier = request.qualifier
+            service_name = request.serviceName
+
+            reply = False
+            if service_name in self.server.service_map:
+                reply = self.server.service_map[service_name].search_for_servers(qualifier)
+            
+            return pb2.PingResponse(answer=reply)
+        except InvalidServerArgumentsException:
+            logging.debug("Server has invalid arguments")
+            context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
+            context.set_details("Server has invalid arguments")
+            return pb2.PingResponse(answer=False)
+
+
+
+
