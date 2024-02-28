@@ -24,7 +24,7 @@ for i in {1..5}; do
     TEST=$(printf "%02d" $i)
     mvn compile exec:java -q < ${TESTS_FOLDER}/input$TEST.txt > ${TESTS_OUTPUT}/out$TEST.txt
 
-    OUTPUT=$(${DIFF} ${TESTS_OUTPUT}/out$TEST.txt ${TESTS_OUT_EXPECTED}/out$TEST.txt) 
+    OUTPUT=$(${DIFF} ${TESTS_OUTPUT}/out$TEST.txt ${TESTS_OUT_EXPECTED}/out$TEST.txt)
     if [ "$OUTPUT" != "" ]; then
         echo "${RED}TEST [$TEST] FAILED${NC}"
         echo "###############################################################################"

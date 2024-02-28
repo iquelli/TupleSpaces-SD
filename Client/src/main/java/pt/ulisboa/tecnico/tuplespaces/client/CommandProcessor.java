@@ -29,10 +29,13 @@ public class CommandProcessor {
 
     void parseInput() {
         Scanner scanner = new Scanner(System.in);
-        boolean exit = false;
 
-        while (!exit) {
-            System.out.print("\n> ");
+        while (true) {
+            System.out.print("> ");
+            if (!scanner.hasNextLine()) {
+                scanner.close();
+                return;
+            }
             String line = scanner.nextLine().trim();
             String[] split = line.split(SPACE);
 
@@ -57,8 +60,8 @@ public class CommandProcessor {
                         this.setdelay(split);
                         break;
                     case EXIT:
-                        exit = true;
-                        break;
+                        scanner.close();
+                        return;
                     default:
                         this.printUsage();
                         break;
@@ -74,8 +77,8 @@ public class CommandProcessor {
             } catch (Exception e) {
                 Logger.error("An unexpected error occurred: " + e.getMessage());
             }
+            System.out.print("\n");
         }
-        scanner.close();
     }
 
     private void put(String[] split) {
