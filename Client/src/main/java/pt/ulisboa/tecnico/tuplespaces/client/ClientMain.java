@@ -25,6 +25,8 @@ public class ClientMain {
 
         CommandProcessor parser = new CommandProcessor(new ClientService(nameServerService));
         parser.parseInput();
+        nameServerService.close();
     }
+
 
 }
