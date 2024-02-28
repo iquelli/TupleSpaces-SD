@@ -64,8 +64,9 @@ public class ServerMain {
             // Server threads are running in the background.
             server.start();
         } catch (Exception e) {
+            System.out.println("Hey");
             Logger.error(
-                    "Failed to start server to listen on port %s" + args[0]
+                    "Failed to start server to listen on port %s", args[0]
             );
             System.exit(1);
         }
