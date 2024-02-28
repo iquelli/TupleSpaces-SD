@@ -85,6 +85,7 @@ public class NameServerService implements AutoCloseable {
             if (ping(qualifier)) {
                 return channelAndStub.stub(); // channel was already created, no need to create again
             }
+            channelAndStub.channel().shutdown();
             this.channelStubPairMap.remove(qualifier);
         }
 

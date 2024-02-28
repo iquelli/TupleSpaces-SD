@@ -19,7 +19,6 @@ public class ClientMain {
         final NameServerService nameServerService = new NameServerService();
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            Logger.debug("Goodbye Client :c");
             nameServerService.close();
         }));
 
