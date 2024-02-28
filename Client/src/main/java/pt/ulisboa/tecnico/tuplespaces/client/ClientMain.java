@@ -27,7 +27,6 @@ public class ClientMain {
             CommandProcessor parser = new CommandProcessor(clientService);
             parser.parseInput();
         }
-
     }
 
 }

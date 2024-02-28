@@ -74,8 +74,8 @@ public class ServerState {
     }
 
     private boolean checkInput(String input) {
-        return input.length() >= 3 && input.startsWith(BGN_TUPLE) && input
-                .endsWith(END_TUPLE) && !input.contains(SPACE);
+        return input.length() >= 3 && input.startsWith(BGN_TUPLE) && input.endsWith(END_TUPLE) &&
+                !input.contains(SPACE);
     }
 
 }

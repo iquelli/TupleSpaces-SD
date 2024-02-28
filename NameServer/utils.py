@@ -52,4 +52,4 @@ def validate_port(port):
 
 
 def validate_qualifier(qualifier):
-    return qualifier != ""
+    return qualifier is not None

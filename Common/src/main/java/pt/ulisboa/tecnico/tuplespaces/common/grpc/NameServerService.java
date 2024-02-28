@@ -33,17 +33,13 @@ public class NameServerService implements AutoCloseable {
             new ConcurrentHashMap<>();
 
     public NameServerService() {
-        channel = ManagedChannelBuilder.forAddress(
-                NAME_SERVER_HOST,
-                NAME_SERVER_PORT
-        ).usePlaintext().build();
+        channel = ManagedChannelBuilder.forAddress(NAME_SERVER_HOST, NAME_SERVER_PORT)
+                .usePlaintext()
+                .build();
         stub = NameServerGrpc.newBlockingStub(channel);
     }
 
-    public void register(
-            int port,
-            String qualifier
-    ) throws StatusRuntimeException {
+    public void register(int port, String qualifier) throws StatusRuntimeException {
         stub.register(
                 RegisterRequest.newBuilder()
                         .setServiceName(SERVICE_NAME)
@@ -58,9 +54,7 @@ public class NameServerService implements AutoCloseable {
         );
     }
 
-    public ServerAddress lookup(
-            String qualifier
-    ) throws StatusRuntimeException {
+    public ServerAddress lookup(String qualifier) throws StatusRuntimeException {
         LookupResponse response = stub.lookup(
                 LookupRequest.newBuilder()
                         .setServiceName(SERVICE_NAME)
@@ -83,7 +77,6 @@ public class NameServerService implements AutoCloseable {
     }
 
     public TupleSpacesBlockingStub connectToServer(String qualifier) throws StatusRuntimeException {
-
         ChannelStubPair<TupleSpacesBlockingStub> channelAndStub = this.channelStubPairMap.get(
                 qualifier
         );
@@ -100,24 +93,16 @@ public class NameServerService implements AutoCloseable {
         String host = address.getHost();
         int port = address.getPort();
 
-        Logger.debug(
-                "Establishing connection to server " + qualifier + " at " +
-                        host + ":" + port
-        );
+        Logger.debug("Establishing connection to server " + qualifier + " at " + host + ":" + port);
 
         ManagedChannel channel = ManagedChannelBuilder.forAddress(host, port)
                 .usePlaintext()
                 .build();
         TupleSpacesBlockingStub stub = TupleSpacesGrpc.newBlockingStub(channel);
 
-        Logger.debug(
-                "Connected to server " + qualifier + " at " + host + ":" + port
-        );
+        Logger.debug("Connected to server " + qualifier + " at " + host + ":" + port);
 
-        this.channelStubPairMap.put(
-                qualifier,
-                new ChannelStubPair<>(channel, stub)
-        );
+        this.channelStubPairMap.put(qualifier, new ChannelStubPair<>(channel, stub));
         return stub;
     }
 

@@ -35,8 +35,8 @@ message DeleteResponse {
 }
 
 message PingRequest {
-  string qualifier = 1;
-  string serviceName = 2;
+  string serviceName = 1;
+  string qualifier = 2;
 }
 message PingResponse {
   bool answer = 1;

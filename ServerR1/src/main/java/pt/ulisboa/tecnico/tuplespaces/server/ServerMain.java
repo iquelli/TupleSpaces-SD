@@ -26,20 +26,14 @@ public class ServerMain {
         // Check number of arguments
         if (args.length != 2) {
             Logger.error("Wrong number of arguments!");
-            Logger.error(
-                    "Usage: mvn exec:java -Dexec.args=\"<port> <qualifier>\""
-            );
+            Logger.error("Usage: mvn exec:java -Dexec.args=\"<port> <qualifier>\"");
             System.exit(1);
         }
 
         final OptionalInt optPort = parsePort(args[0]);
         if (optPort.isEmpty()) {
-            Logger.error(
-                    "The port number must be an integer between 1024 and 65535"
-            );
-            Logger.error(
-                    "Usage: mvn exec:java -Dexec.args=\"<port> <qualifier>\""
-            );
+            Logger.error("The port number must be an integer between 1024 and 65535");
+            Logger.error("Usage: mvn exec:java -Dexec.args=\"<port> <qualifier>\"");
             System.exit(1);
         }
         final int port = optPort.getAsInt();
@@ -47,9 +41,7 @@ public class ServerMain {
         final String qualifier = args[1];
         if (qualifier == null || qualifier.isEmpty()) {
             Logger.error("The qualifier must be a non-empty string");
-            Logger.error(
-                    "Usage: mvn exec:java -Dexec.args=\"<port> <qualifier>\""
-            );
+            Logger.error("Usage: mvn exec:java -Dexec.args=\"<port> <qualifier>\"");
             System.exit(1);
         }
 
@@ -64,10 +56,7 @@ public class ServerMain {
             // Server threads are running in the background.
             server.start();
         } catch (Exception e) {
-            System.out.println("Hey");
-            Logger.error(
-                    "Failed to start server to listen on port %s", args[0]
-            );
+            Logger.error("Failed to start server to listen on port %s", args[0]);
             System.exit(1);
         }
 

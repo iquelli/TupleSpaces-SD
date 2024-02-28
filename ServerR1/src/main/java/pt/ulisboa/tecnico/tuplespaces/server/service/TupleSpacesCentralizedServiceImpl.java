@@ -30,10 +30,7 @@ public class TupleSpacesCentralizedServiceImpl extends TupleSpacesGrpc.TupleSpac
     }
 
     @Override
-    public void put(
-            PutRequest request,
-            StreamObserver<PutResponse> responseObserver
-    ) {
+    public void put(PutRequest request, StreamObserver<PutResponse> responseObserver) {
         try {
             Logger.debug("[INFO] Received PUT request:%n%s", request);
             state.put(request.getNewTuple());
@@ -44,29 +41,22 @@ public class TupleSpacesCentralizedServiceImpl extends TupleSpacesGrpc.TupleSpac
         } catch (InvalidTupleException e) {
             Logger.debug("[ERR] PUT operation failed:%s", e.getMessage());
             responseObserver.onError(
-                    Status.INVALID_ARGUMENT.withDescription(e.getMessage())
-                            .asRuntimeException()
+                    Status.INVALID_ARGUMENT.withDescription(e.getMessage()).asRuntimeException()
             );
         } catch (RuntimeException e) {
             Logger.debug("[ERR] PUT operation failed:%s", e.getMessage());
             responseObserver.onError(
-                    Status.UNKNOWN.withDescription(e.getMessage())
-                            .asRuntimeException()
+                    Status.UNKNOWN.withDescription(e.getMessage()).asRuntimeException()
             );
         }
     }
 
     @Override
-    public void read(
-            ReadRequest request,
-            StreamObserver<ReadResponse> responseObserver
-    ) {
+    public void read(ReadRequest request, StreamObserver<ReadResponse> responseObserver) {
         try {
             Logger.debug("[INFO] Received READ request:%n%s", request);
             String tuple = state.read(request.getSearchPattern());
-            ReadResponse response = ReadResponse.newBuilder()
-                    .setResult(tuple)
-                    .build();
+            ReadResponse response = ReadResponse.newBuilder().setResult(tuple).build();
 
             // Use responseObserver to send a single response back
             responseObserver.onNext(response);
@@ -74,38 +64,29 @@ public class TupleSpacesCentralizedServiceImpl extends TupleSpacesGrpc.TupleSpac
         } catch (InvalidTupleException e) {
             Logger.debug("[ERR] READ operation failed:%s", e.getMessage());
             responseObserver.onError(
-                    Status.INVALID_ARGUMENT.withDescription(e.getMessage())
-                            .asRuntimeException()
+                    Status.INVALID_ARGUMENT.withDescription(e.getMessage()).asRuntimeException()
             );
         } catch (InterruptedException e) {
             Logger.debug("[ERR] READ operation failed:%s", e.getMessage());
             responseObserver.onError(
                     Status.CANCELLED.withDescription(
-                            "Client interrupted while waiting for tuple: " + e
-                                    .getMessage()
-                    )
-                            .asRuntimeException()
+                            "Client interrupted while waiting for tuple: " + e.getMessage()
+                    ).asRuntimeException()
             );
         } catch (RuntimeException e) {
             Logger.debug("[ERR] READ operation failed:%s", e.getMessage());
             responseObserver.onError(
-                    Status.UNKNOWN.withDescription(e.getMessage())
-                            .asRuntimeException()
+                    Status.UNKNOWN.withDescription(e.getMessage()).asRuntimeException()
             );
         }
     }
 
     @Override
-    public void take(
-            TakeRequest request,
-            StreamObserver<TakeResponse> responseObserver
-    ) {
+    public void take(TakeRequest request, StreamObserver<TakeResponse> responseObserver) {
         try {
             Logger.debug("[INFO] Received TAKE request:%n%s", request);
             String tuple = state.take(request.getSearchPattern());
-            TakeResponse response = TakeResponse.newBuilder()
-                    .setResult(tuple)
-                    .build();
+            TakeResponse response = TakeResponse.newBuilder().setResult(tuple).build();
 
             // Use responseObserver to send a single response back
             responseObserver.onNext(response);
@@ -113,23 +94,19 @@ public class TupleSpacesCentralizedServiceImpl extends TupleSpacesGrpc.TupleSpac
         } catch (InvalidTupleException e) {
             Logger.debug("[ERR] TAKE operation failed:%s", e.getMessage());
             responseObserver.onError(
-                    Status.INVALID_ARGUMENT.withDescription(e.getMessage())
-                            .asRuntimeException()
+                    Status.INVALID_ARGUMENT.withDescription(e.getMessage()).asRuntimeException()
             );
         } catch (InterruptedException e) {
             Logger.debug("[ERR] TAKE operation failed:%s", e.getMessage());
             responseObserver.onError(
                     Status.CANCELLED.withDescription(
-                            "Client interrupted while waiting for tuple: " + e
-                                    .getMessage()
-                    )
-                            .asRuntimeException()
+                            "Client interrupted while waiting for tuple: " + e.getMessage()
+                    ).asRuntimeException()
             );
         } catch (RuntimeException e) {
             Logger.debug("[ERR] TAKE operation failed:%s", e.getMessage());
             responseObserver.onError(
-                    Status.UNKNOWN.withDescription(e.getMessage())
-                            .asRuntimeException()
+                    Status.UNKNOWN.withDescription(e.getMessage()).asRuntimeException()
             );
         }
     }
@@ -140,16 +117,12 @@ public class TupleSpacesCentralizedServiceImpl extends TupleSpacesGrpc.TupleSpac
             StreamObserver<getTupleSpacesStateResponse> responseObserver
     ) {
         try {
-            Logger.debug(
-                    "[INFO] Received GET_TUPLE_SPACE_STATE request%n",
-                    request
-            );
+            Logger.debug("[INFO] Received GET_TUPLE_SPACE_STATE request%n", request);
             // Get the tuples from the space state
             List<String> tuples = state.getTupleSpacesState();
 
             // Builder to construct a new Protobuffer object
-            getTupleSpacesStateResponse response = getTupleSpacesStateResponse
-                    .newBuilder()
+            getTupleSpacesStateResponse response = getTupleSpacesStateResponse.newBuilder()
                     .addAllTuple(tuples)
                     .build();
 
@@ -157,13 +130,9 @@ public class TupleSpacesCentralizedServiceImpl extends TupleSpacesGrpc.TupleSpac
             responseObserver.onNext(response);
             responseObserver.onCompleted();
         } catch (RuntimeException e) {
-            Logger.debug(
-                    "[ERR] GET_TUPLE_SPACE_STATE operation failed:%s",
-                    e.getMessage()
-            );
+            Logger.debug("[ERR] GET_TUPLE_SPACE_STATE operation failed:%s", e.getMessage());
             responseObserver.onError(
-                    Status.UNKNOWN.withDescription(e.getMessage())
-                            .asRuntimeException()
+                    Status.UNKNOWN.withDescription(e.getMessage()).asRuntimeException()
             );
         }
     }

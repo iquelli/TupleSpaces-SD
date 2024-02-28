@@ -5,17 +5,16 @@ import java.util.concurrent.atomic.AtomicBoolean;
 // Helper class to print debug messages.
 public final class Logger {
 
-    private static final AtomicBoolean debugFlag =
-            new AtomicBoolean(System.getProperty("debug") != null);
+    private static final AtomicBoolean debugFlag = new AtomicBoolean(
+            System.getProperty("debug") != null
+    );
 
     private Logger() {
     }
 
-
     public static void setDebugFlag(boolean flag) {
         debugFlag.set(flag);
     }
-
 
     public static void debug(String debugMessage, Object... args) {
         if (debugFlag.get()) {

@@ -26,16 +26,12 @@ public class ClientService extends TupleSpacesGrpc.TupleSpacesImplBase implement
     }
 
     public void put(String newTuple) throws StatusRuntimeException {
-        TupleSpacesBlockingStub stub = nameServerService.connectToServer(
-                defaultQualifier
-        );
+        TupleSpacesBlockingStub stub = nameServerService.connectToServer(defaultQualifier);
         stub.put(PutRequest.newBuilder().setNewTuple(newTuple).build());
     }
 
     public String read(String searchPattern) throws StatusRuntimeException {
-        TupleSpacesBlockingStub stub = nameServerService.connectToServer(
-                defaultQualifier
-        );
+        TupleSpacesBlockingStub stub = nameServerService.connectToServer(defaultQualifier);
         ReadResponse response = stub.read(
                 ReadRequest.newBuilder().setSearchPattern(searchPattern).build()
         );
@@ -44,9 +40,7 @@ public class ClientService extends TupleSpacesGrpc.TupleSpacesImplBase implement
     }
 
     public String take(String searchPattern) throws StatusRuntimeException {
-        TupleSpacesBlockingStub stub = nameServerService.connectToServer(
-                defaultQualifier
-        );
+        TupleSpacesBlockingStub stub = nameServerService.connectToServer(defaultQualifier);
         TakeResponse response = stub.take(
                 TakeRequest.newBuilder().setSearchPattern(searchPattern).build()
         );
@@ -57,9 +51,7 @@ public class ClientService extends TupleSpacesGrpc.TupleSpacesImplBase implement
     public List<String> getTupleSpacesState(
             String qualifier
     ) throws StatusRuntimeException {
-        TupleSpacesBlockingStub stub = nameServerService.connectToServer(
-                qualifier
-        );
+        TupleSpacesBlockingStub stub = nameServerService.connectToServer(qualifier);
         getTupleSpacesStateResponse response = stub.getTupleSpacesState(
                 getTupleSpacesStateRequest.newBuilder().build()
         );

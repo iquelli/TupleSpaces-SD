@@ -65,18 +65,14 @@ public class CommandProcessor {
                 }
             } catch (StatusRuntimeException e) {
                 if (e.getStatus().getCode() == Status.Code.UNAVAILABLE) {
-                    Logger.error(
-                            "Failed to establish connection to server"
-                    );
+                    Logger.error("Failed to establish connection to server");
                 } else if (e.getStatus().getDescription() != null) {
                     Logger.error(e.getStatus().getDescription());
                 } else {
                     Logger.error("gRCP Error: " + e.getMessage());
                 }
             } catch (Exception e) {
-                Logger.error(
-                        "An unexpected error occurred: " + e.getMessage()
-                );
+                Logger.error("An unexpected error occurred: " + e.getMessage());
             }
         }
         scanner.close();
@@ -137,9 +133,7 @@ public class CommandProcessor {
         String qualifier = split[1];
 
         // get the tuple spaces state
-        List<String> tupleList = clientService.getTupleSpacesState(
-                qualifier
-        );
+        List<String> tupleList = clientService.getTupleSpacesState(qualifier);
         System.out.println("OK");
 
         if (tupleList != null && !tupleList.isEmpty()) {
@@ -147,9 +141,7 @@ public class CommandProcessor {
                 System.out.println(tuple);
             }
         } else {
-            System.out.println(
-                    "No tuples in server with qualifier: " + qualifier
-            );
+            System.out.println("No tuples in server with qualifier: " + qualifier);
         }
     }
 
@@ -192,9 +184,7 @@ public class CommandProcessor {
         }
 
         // register delay <time> for when calling server <qualifier>
-        System.out.println(
-                "TODO: implement setdelay command (only needed in phases 2+3)"
-        );
+        System.out.println("TODO: implement setdelay command (only needed in phases 2+3)");
     }
 
     private void printUsage() {
@@ -209,8 +199,11 @@ public class CommandProcessor {
     }
 
     private boolean inputIsValid(String[] input) {
-        if (input.length < 2 || !input[1].startsWith(BGN_TUPLE) || !input[1]
-                .endsWith(END_TUPLE) || input.length > 2) {
+        if (input.length < 2 || !input[1].startsWith(BGN_TUPLE) || !input[1].endsWith(END_TUPLE) ||
+                input.length > 2) {
+            System.out.println(
+                    "The tuple/pattern inserted is invalid. A valid tuple has the format <element[,more_elements]> with no spaces."
+            );
             return false;
         } else {
             return true;
