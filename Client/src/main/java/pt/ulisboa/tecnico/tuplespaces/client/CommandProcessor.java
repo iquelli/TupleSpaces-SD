@@ -140,7 +140,7 @@ public class CommandProcessor {
         System.out.println("OK");
 
         if (tupleList != null && !tupleList.isEmpty()) {
-            System.out.println("[" + String.join(", ", tupleList) + "]");
+            System.out.println(tupleList);
         } else {
             System.out.println("[]");
         }
@@ -200,8 +200,8 @@ public class CommandProcessor {
     }
 
     private boolean inputIsValid(String[] input) {
-        if (input.length < 2 || !input[1].startsWith(BGN_TUPLE) || !input[1].endsWith(END_TUPLE) ||
-                input.length > 2) {
+        if (input.length < 2 || input[1].length() < 3 || !input[1].startsWith(BGN_TUPLE) ||
+                !input[1].endsWith(END_TUPLE) || input.length > 2) {
             System.out.println(
                     "The tuple/pattern inserted is invalid. A valid tuple has the format <element[,more_elements]> with no spaces."
             );

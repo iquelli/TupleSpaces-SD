@@ -14,7 +14,6 @@ import java.util.OptionalInt;
 public class ServerMain {
 
     public static void main(String[] args) throws Exception {
-
         Logger.debug(ServerMain.class.getSimpleName() + " started");
 
         // Receive and print arguments

@@ -18,7 +18,6 @@ import pt.ulisboa.tecnico.tuplespaces.nameserver.contract.NameServerOuterClass.S
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-
 public class NameServerService implements AutoCloseable {
 
     private static final String NAME_SERVER_HOST = "localhost";
@@ -69,8 +68,8 @@ public class NameServerService implements AutoCloseable {
     public Boolean ping(String qualifier) {
         PingResponse response = stub.ping(
                 PingRequest.newBuilder()
-                        .setQualifier(qualifier)
                         .setServiceName(SERVICE_NAME)
+                        .setQualifier(qualifier)
                         .build()
         );
         return response.getAnswer();
@@ -82,7 +81,7 @@ public class NameServerService implements AutoCloseable {
         );
 
         if (channelAndStub != null && !channelAndStub.channel().isTerminated()) {
-            if (ping(qualifier)) {
+            if (this.ping(qualifier)) {
                 return channelAndStub.stub(); // channel was already created, no need to create again
             }
             channelAndStub.channel().shutdown();
