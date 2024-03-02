@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 CLIENT_PATH=${PWD}/../Client
 TESTS_FOLDER=${PWD}

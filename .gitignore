@@ -139,6 +139,8 @@ buildNumber.properties
 /.settings/
 /Contract/.settings/
 /ServerR1/.settings/
+/ServerR2/.settings/
+/ServerR3/.settings/
 /Client/.settings/
 /.venv/
 /NameServer/NameServer.iml

@@ -25,7 +25,6 @@ message TakePhase1Response {
 message TakePhase1ReleaseRequest {
   int32 clientId = 2;
 }
-
 message TakePhase1ReleaseResponse {
 }
 
