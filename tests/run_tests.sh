@@ -19,10 +19,10 @@ rm -rf $TESTS_OUTPUT
 mkdir -p $TESTS_OUTPUT
 
 cd $CLIENT_PATH
-for i in {1..5}; do
+for i in {1..6}; do
     echo "-------------------------------------------------------------------------------"
     TEST=$(printf "%02d" $i)
-    mvn compile exec:java -q < ${TESTS_FOLDER}/input$TEST.txt > ${TESTS_OUTPUT}/out$TEST.txt
+    time mvn compile exec:java -q < ${TESTS_FOLDER}/input$TEST.txt > ${TESTS_OUTPUT}/out$TEST.txt
 
     OUTPUT=$(${DIFF} ${TESTS_OUTPUT}/out$TEST.txt ${TESTS_OUT_EXPECTED}/out$TEST.txt)
     if [ "$OUTPUT" != "" ]; then

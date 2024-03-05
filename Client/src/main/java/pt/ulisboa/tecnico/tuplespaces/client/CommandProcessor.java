@@ -173,7 +173,10 @@ public class CommandProcessor {
             this.printUsage();
             return;
         }
-        String qualifier = split[1];
+        int qualifier = indexOfServerQualifier(split[1]);
+        if (qualifier == -1) {
+            Logger.error("Invalid server qualifier");
+        }
         Integer time;
 
         // checks if input String can be parsed as an Integer
@@ -185,7 +188,8 @@ public class CommandProcessor {
         }
 
         // register delay <time> for when calling server <qualifier>
-        System.out.println("TODO: implement setdelay command (only needed in phases 2+3)");
+        this.clientService.setDelay(qualifier, time);
+        System.out.println("");
     }
 
     private void printUsage() {
@@ -197,6 +201,19 @@ public class CommandProcessor {
                         "- sleep <integer>\n" +
                         "- setdelay <server> <integer>\n" + "- exit"
         );
+    }
+
+    private int indexOfServerQualifier(String qualifier) {
+        switch (qualifier) {
+            case "A":
+                return 0;
+            case "B":
+                return 1;
+            case "C":
+                return 2;
+            default:
+                return -1;
+        }
     }
 
     private boolean inputIsValid(String[] input) {

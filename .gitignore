@@ -135,15 +135,16 @@ buildNumber.properties
 .classpath
 
 # End of https://www.toptal.com/developers/gitignore/api/java,maven,intellij+all
+.vscode
 /.idea/
 /.settings/
+/Client/.settings/
+/Common/.settings/
 /Contract/.settings/
 /ServerR1/.settings/
 /ServerR2/.settings/
 /ServerR3/.settings/
-/Client/.settings/
-/.venv/
 /NameServer/NameServer.iml
 /NameServer/__pycache__/
-.vscode
+/.venv/
 tests/test-outputs/

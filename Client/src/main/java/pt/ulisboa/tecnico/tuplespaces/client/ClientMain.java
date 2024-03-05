@@ -6,6 +6,8 @@ import pt.ulisboa.tecnico.tuplespaces.common.grpc.NameServerService;
 
 public class ClientMain {
 
+    static final int numServers = 3;
+
     public static void main(String[] args) {
         Logger.debug("Hello Client!");
 
@@ -22,7 +24,9 @@ public class ClientMain {
             nameServerService.close();
         }));
 
-        CommandProcessor parser = new CommandProcessor(new ClientService(nameServerService));
+        CommandProcessor parser = new CommandProcessor(
+                new ClientService(nameServerService, ClientMain.numServers)
+        );
         parser.parseInput();
         nameServerService.close();
     }
