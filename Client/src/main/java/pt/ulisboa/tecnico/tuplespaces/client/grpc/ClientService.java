@@ -28,6 +28,7 @@ public class ClientService extends TupleSpacesReplicaGrpc.TupleSpacesReplicaImpl
         /* The delayer can be used to inject delays to the sending of requests to the
            different servers, according to the per-server delays that have been set  */
         this.delayer = new OrderedDelayer(numServers);
+        this.connectionManager = new ConnectionManager();
     }
 
     public void put(String newTuple) throws StatusRuntimeException, InterruptedException {

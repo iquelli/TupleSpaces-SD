@@ -11,6 +11,10 @@ import java.util.List;
 
 public class ConnectionManager {
 
+    public ConnectionManager() {
+        
+    }
+
     public TupleSpacesReplicaStub resolveStub(ManagedChannel channel) {
         TupleSpacesReplicaStub stub = TupleSpacesReplicaGrpc.newStub(channel);
         Logger.debug("Connected to server");
