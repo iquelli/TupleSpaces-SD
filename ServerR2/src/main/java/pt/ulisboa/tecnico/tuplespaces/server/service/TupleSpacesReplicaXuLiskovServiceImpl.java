@@ -16,7 +16,6 @@ import pt.ulisboa.tecnico.tuplespaces.replicaXuLiskov.contract.TupleSpacesReplic
 import pt.ulisboa.tecnico.tuplespaces.replicaXuLiskov.contract.TupleSpacesReplicaXuLiskov.getTupleSpacesStateResponse;
 import pt.ulisboa.tecnico.tuplespaces.server.domain.ServerState;
 
-
 /**
  * Implements the TupleSpaces Replica Xu Liskov Variant service, handling gRPC
  * requests.

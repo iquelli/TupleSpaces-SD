@@ -15,6 +15,8 @@ import pt.ulisboa.tecnico.tuplespaces.nameserver.contract.NameServerOuterClass.S
 import pt.ulisboa.tecnico.tuplespaces.replicaXuLiskov.contract.TupleSpacesReplicaGrpc;
 import pt.ulisboa.tecnico.tuplespaces.replicaXuLiskov.contract.TupleSpacesReplicaGrpc.TupleSpacesReplicaStub;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -23,6 +25,7 @@ public class NameServerService implements AutoCloseable {
     private static final String NAME_SERVER_HOST = "localhost";
     private static final int NAME_SERVER_PORT = 5001;
     private static final String SERVICE_NAME = "TupleSpaces";
+    private static final String[] QUALIFIERS = {"A", "B", "C"};
 
     private final ManagedChannel channel;
     private final NameServerGrpc.NameServerBlockingStub stub;
@@ -53,6 +56,24 @@ public class NameServerService implements AutoCloseable {
         );
     }
 
+    public void delete(int port) {
+        try {
+            stub.delete(
+                    DeleteRequest.newBuilder()
+                            .setServiceName(SERVICE_NAME)
+                            .setAddress(
+                                    ServerAddress.newBuilder()
+                                            .setHost(NAME_SERVER_HOST)
+                                            .setPort(port)
+                                            .build()
+                            )
+                            .build()
+            );
+        } catch (StatusRuntimeException e) {
+            Logger.debug("[ERR] %s", e.getMessage());
+        }
+    }
+
     public ServerAddress lookup(String qualifier) throws StatusRuntimeException {
         LookupResponse response = stub.lookup(
                 LookupRequest.newBuilder()
@@ -65,22 +86,20 @@ public class NameServerService implements AutoCloseable {
         return response.getServerList().get(0).getAddress();
     }
 
-    public Boolean ping(String qualifier) {
-        PingResponse response = stub.ping(
-                PingRequest.newBuilder()
-                        .setServiceName(SERVICE_NAME)
-                        .setQualifier(qualifier)
-                        .build()
-        );
-        return response.getAnswer();
+    public List<TupleSpacesReplicaStub> connectToServers() throws StatusRuntimeException {
+        List<TupleSpacesReplicaStub> stubs = new ArrayList<TupleSpacesReplicaStub>();
+        for (String qualifier : QUALIFIERS) {
+            stubs.add(this.connectToServer(qualifier));
+        }
+        return stubs;
     }
 
-    public TupleSpacesReplicaStub connectToServer(String qualifier) throws StatusRuntimeException {
+    private TupleSpacesReplicaStub connectToServer(String qualifier) throws StatusRuntimeException {
         ChannelStubPair<TupleSpacesReplicaStub> channelAndStub = this.channelStubPairMap.get(
                 qualifier
         );
 
-        if (channelAndStub != null && !channelAndStub.channel().isTerminated()) {
+        if (channelAndStub != null && !channelAndStub.channel().isShutdown()) {
             if (this.ping(qualifier)) {
                 return channelAndStub.stub(); // channel was already created, no need to create again
             }
@@ -106,22 +125,14 @@ public class NameServerService implements AutoCloseable {
         return stub;
     }
 
-    public void delete(int port) {
-        try {
-            stub.delete(
-                    DeleteRequest.newBuilder()
-                            .setServiceName(SERVICE_NAME)
-                            .setAddress(
-                                    ServerAddress.newBuilder()
-                                            .setHost(NAME_SERVER_HOST)
-                                            .setPort(port)
-                                            .build()
-                            )
-                            .build()
-            );
-        } catch (StatusRuntimeException e) {
-            Logger.debug("[ERR] %s", e.getMessage());
-        }
+    private Boolean ping(String qualifier) {
+        PingResponse response = stub.ping(
+                PingRequest.newBuilder()
+                        .setServiceName(SERVICE_NAME)
+                        .setQualifier(qualifier)
+                        .build()
+        );
+        return response.getAnswer();
     }
 
     @Override
