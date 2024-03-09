@@ -2,9 +2,17 @@ package pt.ulisboa.tecnico.tuplespaces.client.grpc;
 
 import io.grpc.StatusRuntimeException;
 import pt.ulisboa.tecnico.tuplespaces.client.util.OrderedDelayer;
+import pt.ulisboa.tecnico.tuplespaces.client.util.ResponseCollector;
+import pt.ulisboa.tecnico.tuplespaces.client.util.ResponseObserver;
 import pt.ulisboa.tecnico.tuplespaces.common.grpc.NameServerService;
 import pt.ulisboa.tecnico.tuplespaces.replicaXuLiskov.contract.TupleSpacesReplicaGrpc;
 import pt.ulisboa.tecnico.tuplespaces.replicaXuLiskov.contract.TupleSpacesReplicaGrpc.TupleSpacesReplicaStub;
+import pt.ulisboa.tecnico.tuplespaces.replicaXuLiskov.contract.TupleSpacesReplicaXuLiskov.PutRequest;
+import pt.ulisboa.tecnico.tuplespaces.replicaXuLiskov.contract.TupleSpacesReplicaXuLiskov.ReadRequest;
+import pt.ulisboa.tecnico.tuplespaces.replicaXuLiskov.contract.TupleSpacesReplicaXuLiskov.ReadResponse;
+
+
+
 
 import java.util.List;
 
@@ -12,6 +20,7 @@ public class ClientService extends TupleSpacesReplicaGrpc.TupleSpacesReplicaImpl
 
     NameServerService nameServerService;
     OrderedDelayer delayer;
+    ResponseCollector collector;
 
     public ClientService(NameServerService nameServerService, int numServers) {
         this.nameServerService = nameServerService;
@@ -21,25 +30,22 @@ public class ClientService extends TupleSpacesReplicaGrpc.TupleSpacesReplicaImpl
         this.delayer = new OrderedDelayer(numServers);
     }
 
-    public void put(String newTuple) throws StatusRuntimeException {
+    public void put(String newTuple) throws StatusRuntimeException, InterruptedException {
         List<TupleSpacesReplicaStub> stubs = nameServerService.connectToServers();
         for (int id : delayer) {
-            // stubs[id].put(PutRequest.newBuilder().setNewTuple(newTuple).build());
-            // TODO: adjust put for multiple servers
+            stubs.get(id).put(PutRequest.newBuilder().setNewTuple(newTuple).build(), new ResponseObserver(collector));
         }
+        collector.waitUntilAllPutReceived(3);
     }
 
-    public String read(String searchPattern) throws StatusRuntimeException {
+    public String read(String searchPattern) throws StatusRuntimeException, InterruptedException {
         List<TupleSpacesReplicaStub> stubs = nameServerService.connectToServers();
         for (int id : delayer) {
-            // ReadResponse response = stubs[id].read(
-            //         ReadRequest.newBuilder().setSearchPattern(searchPattern).build()
-            // );
-            // TODO: adjust read for multiple servers
+            stubs.get(id).read(ReadRequest.newBuilder().setSearchPattern(searchPattern).build(), new ResponseObserver(collector));
         }
+        collector.waitUntilAllReadReceived(1);
 
-        // return response.getResult();
-        return null;
+        return collector.getReadStrings();
     }
 
     public String take(String searchPattern) throws StatusRuntimeException {

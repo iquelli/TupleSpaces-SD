@@ -74,6 +74,8 @@ public class CommandProcessor {
                 } else {
                     Logger.error("gRCP Error: " + e.getMessage());
                 }
+            } catch (InterruptedException e) {
+                Logger.error("An unexpected error occurred");
             } catch (Exception e) {
                 Logger.error("An unexpected error occurred: " + e.getMessage());
             }
@@ -81,7 +83,7 @@ public class CommandProcessor {
         }
     }
 
-    private void put(String[] split) {
+    private void put(String[] split) throws InterruptedException{
         // check if input is valid
         if (!this.inputIsValid(split)) {
             this.printUsage();
@@ -90,13 +92,12 @@ public class CommandProcessor {
 
         // get the tuple
         String tuple = split[1];
-
         // put the tuple
         clientService.put(tuple);
         System.out.println("OK");
     }
 
-    private void read(String[] split) {
+    private void read(String[] split) throws InterruptedException{
         // check if input is valid
         if (!this.inputIsValid(split)) {
             this.printUsage();
@@ -105,7 +106,6 @@ public class CommandProcessor {
 
         // get the tuple
         String tuple = split[1];
-
         // read the tuple
         String responseTuple = clientService.read(tuple);
         System.out.println("OK");
