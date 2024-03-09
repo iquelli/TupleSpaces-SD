@@ -34,17 +34,8 @@ message DeleteRequest {
 message DeleteResponse {
 }
 
-message PingRequest {
-  string serviceName = 1;
-  string qualifier = 2;
-}
-message PingResponse {
-  bool answer = 1;
-}
-
 service NameServer {
   rpc register(RegisterRequest) returns (RegisterResponse);
   rpc lookup(LookupRequest) returns (LookupResponse);
   rpc delete(DeleteRequest) returns (DeleteResponse);
-  rpc ping(PingRequest) returns (PingResponse);
 }
