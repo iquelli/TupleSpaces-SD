@@ -1,5 +1,7 @@
 package pt.ulisboa.tecnico.tuplespaces.client.util;
 
+import pt.ulisboa.tecnico.tuplespaces.common.Logger;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -43,17 +45,19 @@ public class OrderedDelayer implements Iterable<Integer> {
             DelayPair dp = iter.next();
             if (dp != null) {
                 int secsToSleep = dp.delay - alreadySlept;
-                if (secsToSleep > 0)
+                if (secsToSleep > 0) {
                     try {
-                        // System.out.println("will sleep for " + secsToSleep);
+                        Logger.debug("Will sleep for %d seconds", secsToSleep);
                         Thread.sleep((dp.delay - alreadySlept) * 1000);
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
                     }
+                }
                 alreadySlept += secsToSleep;
                 return dp.id;
-            } else
+            } else {
                 return null;
+            }
         }
 
     }
@@ -62,8 +66,9 @@ public class OrderedDelayer implements Iterable<Integer> {
 
     public OrderedDelayer(int numItems) {
         orderedDelayPairs = new ArrayList<DelayPair>();
-        for (int i = 0; i < numItems; i++)
+        for (int i = 0; i < numItems; i++) {
             orderedDelayPairs.add(new DelayPair(i));
+        }
     }
 
     public int setDelay(int id, int delay) {

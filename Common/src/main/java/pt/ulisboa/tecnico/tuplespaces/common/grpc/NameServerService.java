@@ -3,8 +3,6 @@ package pt.ulisboa.tecnico.tuplespaces.common.grpc;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;
-import pt.ulisboa.tecnico.tuplespaces.centralized.contract.TupleSpacesGrpc;
-import pt.ulisboa.tecnico.tuplespaces.centralized.contract.TupleSpacesGrpc.TupleSpacesBlockingStub;
 import pt.ulisboa.tecnico.tuplespaces.common.Logger;
 import pt.ulisboa.tecnico.tuplespaces.nameserver.contract.NameServerGrpc;
 import pt.ulisboa.tecnico.tuplespaces.nameserver.contract.NameServerOuterClass.DeleteRequest;
@@ -14,6 +12,8 @@ import pt.ulisboa.tecnico.tuplespaces.nameserver.contract.NameServerOuterClass.P
 import pt.ulisboa.tecnico.tuplespaces.nameserver.contract.NameServerOuterClass.PingResponse;
 import pt.ulisboa.tecnico.tuplespaces.nameserver.contract.NameServerOuterClass.RegisterRequest;
 import pt.ulisboa.tecnico.tuplespaces.nameserver.contract.NameServerOuterClass.ServerAddress;
+import pt.ulisboa.tecnico.tuplespaces.replicaXuLiskov.contract.TupleSpacesReplicaGrpc;
+import pt.ulisboa.tecnico.tuplespaces.replicaXuLiskov.contract.TupleSpacesReplicaGrpc.TupleSpacesReplicaStub;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -28,7 +28,7 @@ public class NameServerService implements AutoCloseable {
     private final NameServerGrpc.NameServerBlockingStub stub;
 
     // Map with all the connections estabilished
-    private final Map<String, ChannelStubPair<TupleSpacesBlockingStub>> channelStubPairMap =
+    private final Map<String, ChannelStubPair<TupleSpacesReplicaStub>> channelStubPairMap =
             new ConcurrentHashMap<>();
 
     public NameServerService() {
@@ -75,8 +75,8 @@ public class NameServerService implements AutoCloseable {
         return response.getAnswer();
     }
 
-    public TupleSpacesBlockingStub connectToServer(String qualifier) throws StatusRuntimeException {
-        ChannelStubPair<TupleSpacesBlockingStub> channelAndStub = this.channelStubPairMap.get(
+    public TupleSpacesReplicaStub connectToServer(String qualifier) throws StatusRuntimeException {
+        ChannelStubPair<TupleSpacesReplicaStub> channelAndStub = this.channelStubPairMap.get(
                 qualifier
         );
 
@@ -98,7 +98,7 @@ public class NameServerService implements AutoCloseable {
         ManagedChannel channel = ManagedChannelBuilder.forAddress(host, port)
                 .usePlaintext()
                 .build();
-        TupleSpacesBlockingStub stub = TupleSpacesGrpc.newBlockingStub(channel);
+        TupleSpacesReplicaStub stub = TupleSpacesReplicaGrpc.newStub(channel);
 
         Logger.debug("Connected to server " + qualifier + " at " + host + ":" + port);
 
