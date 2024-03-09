@@ -66,7 +66,7 @@ mvn exec:java -Dexec.args="<port> <qualifier>"
 To run the client, the following command can be performed in the respective client folder:
 
 ```s
-mvn exec:java
+mvn exec:java -Dexec.args="<client id>"
 ```
 
 To run the name server, the following command can be performed in the respective name server folder:
