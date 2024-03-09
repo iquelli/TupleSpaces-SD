@@ -12,6 +12,9 @@ import pt.ulisboa.tecnico.tuplespaces.replicaXuLiskov.contract.TupleSpacesReplic
 import pt.ulisboa.tecnico.tuplespaces.replicaXuLiskov.contract.TupleSpacesReplicaGrpc.TupleSpacesReplicaStub;
 import pt.ulisboa.tecnico.tuplespaces.replicaXuLiskov.contract.TupleSpacesReplicaXuLiskov.PutRequest;
 import pt.ulisboa.tecnico.tuplespaces.replicaXuLiskov.contract.TupleSpacesReplicaXuLiskov.ReadRequest;
+import pt.ulisboa.tecnico.tuplespaces.replicaXuLiskov.contract.TupleSpacesReplicaXuLiskov.getTupleSpacesStateRequest;
+import pt.ulisboa.tecnico.tuplespaces.replicaXuLiskov.contract.TupleSpacesReplicaXuLiskov.getTupleSpacesStateResponse;
+
 
 import java.util.List;
 
@@ -21,7 +24,7 @@ public class ClientService extends TupleSpacesReplicaGrpc.TupleSpacesReplicaImpl
 
     private NameServerService nameServerService;
     private OrderedDelayer delayer;
-    private ResponseCollector collector;
+    private ResponseCollector collector = new ResponseCollector();
     private ConnectionManager connectionManager;
 
     public ClientService(NameServerService nameServerService, int numServers, int id) {
@@ -84,16 +87,13 @@ public class ClientService extends TupleSpacesReplicaGrpc.TupleSpacesReplicaImpl
         ManagedChannel channel = nameServerService.getChannel(qualifier);
         TupleSpacesReplicaBlockingStub stub = connectionManager.resolveBlockingStub(channel);
 
-        for (int id : delayer) {
-            // getTupleSpacesStateResponse response = stubs[id].getTupleSpacesState(
-            //         getTupleSpacesStateRequest.newBuilder().build()
-            // );
-            // TODO: adjust getTupleSpacesState for multiple servers
-        }
+        getTupleSpacesStateResponse response = stub.getTupleSpacesState(
+                getTupleSpacesStateRequest.newBuilder().build()
+        );
 
-        // return response.getTupleList();
         connectionManager.closeChannel(channel);
-        return null;
+        return response.getTupleList();
+
     }
 
     /**
