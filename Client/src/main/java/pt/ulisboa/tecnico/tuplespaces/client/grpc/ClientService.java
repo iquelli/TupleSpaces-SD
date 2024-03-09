@@ -17,18 +17,21 @@ import java.util.List;
 
 public class ClientService extends TupleSpacesReplicaGrpc.TupleSpacesReplicaImplBase {
 
-    NameServerService nameServerService;
-    OrderedDelayer delayer;
-    ResponseCollector collector = new ResponseCollector();
-    ConnectionManager connectionManager;
+    private final int ID;
 
-    public ClientService(NameServerService nameServerService, int numServers) {
+    private NameServerService nameServerService;
+    private OrderedDelayer delayer;
+    private ResponseCollector collector;
+    private ConnectionManager connectionManager;
+
+    public ClientService(NameServerService nameServerService, int numServers, int id) {
         this.nameServerService = nameServerService;
+        this.connectionManager = new ConnectionManager();
+        this.ID = id;
 
         /* The delayer can be used to inject delays to the sending of requests to the
            different servers, according to the per-server delays that have been set  */
         this.delayer = new OrderedDelayer(numServers);
-        this.connectionManager = new ConnectionManager();
     }
 
     public void put(String newTuple) throws StatusRuntimeException, InterruptedException {
@@ -109,6 +112,10 @@ public class ClientService extends TupleSpacesReplicaGrpc.TupleSpacesReplicaImpl
      */
     public void setDelay(int id, int delay) {
         delayer.setDelay(id, delay);
+    }
+
+    public int getId() {
+        return ID;
     }
 
 }

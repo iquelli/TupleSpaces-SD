@@ -12,7 +12,7 @@ import java.util.List;
 public class ConnectionManager {
 
     public ConnectionManager() {
-        
+
     }
 
     public TupleSpacesReplicaStub resolveStub(ManagedChannel channel) {
