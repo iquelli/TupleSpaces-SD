@@ -19,7 +19,7 @@ public class ClientService extends TupleSpacesReplicaGrpc.TupleSpacesReplicaImpl
 
     NameServerService nameServerService;
     OrderedDelayer delayer;
-    ResponseCollector collector;
+    ResponseCollector collector = new ResponseCollector();
     ConnectionManager connectionManager;
 
     public ClientService(NameServerService nameServerService, int numServers) {
