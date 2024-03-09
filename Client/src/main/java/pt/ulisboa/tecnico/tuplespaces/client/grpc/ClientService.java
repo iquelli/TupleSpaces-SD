@@ -11,26 +11,28 @@ import pt.ulisboa.tecnico.tuplespaces.replicaXuLiskov.contract.TupleSpacesReplic
 import pt.ulisboa.tecnico.tuplespaces.replicaXuLiskov.contract.TupleSpacesReplicaGrpc.TupleSpacesReplicaBlockingStub;
 import pt.ulisboa.tecnico.tuplespaces.replicaXuLiskov.contract.TupleSpacesReplicaGrpc.TupleSpacesReplicaStub;
 import pt.ulisboa.tecnico.tuplespaces.replicaXuLiskov.contract.TupleSpacesReplicaXuLiskov.PutRequest;
+import pt.ulisboa.tecnico.tuplespaces.replicaXuLiskov.contract.TupleSpacesReplicaXuLiskov.PutResponse;
 import pt.ulisboa.tecnico.tuplespaces.replicaXuLiskov.contract.TupleSpacesReplicaXuLiskov.ReadRequest;
+import pt.ulisboa.tecnico.tuplespaces.replicaXuLiskov.contract.TupleSpacesReplicaXuLiskov.ReadResponse;
 import pt.ulisboa.tecnico.tuplespaces.replicaXuLiskov.contract.TupleSpacesReplicaXuLiskov.getTupleSpacesStateRequest;
 import pt.ulisboa.tecnico.tuplespaces.replicaXuLiskov.contract.TupleSpacesReplicaXuLiskov.getTupleSpacesStateResponse;
-
 
 import java.util.List;
 
 public class ClientService extends TupleSpacesReplicaGrpc.TupleSpacesReplicaImplBase {
 
     private final int ID;
-
     private NameServerService nameServerService;
-    private OrderedDelayer delayer;
-    private ResponseCollector collector = new ResponseCollector();
     private ConnectionManager connectionManager;
+    private OrderedDelayer delayer;
+
+    private ResponseCollector putCollector;
+    private ResponseCollector readCollector;
 
     public ClientService(NameServerService nameServerService, int numServers, int id) {
+        this.ID = id;
         this.nameServerService = nameServerService;
         this.connectionManager = new ConnectionManager();
-        this.ID = id;
 
         /* The delayer can be used to inject delays to the sending of requests to the
            different servers, according to the per-server delays that have been set  */
@@ -44,10 +46,10 @@ public class ClientService extends TupleSpacesReplicaGrpc.TupleSpacesReplicaImpl
             stubs.get(id)
                     .put(
                             PutRequest.newBuilder().setNewTuple(newTuple).build(),
-                            new ResponseObserver(collector)
+                            new ResponseObserver<PutResponse>(putCollector)
                     );
         }
-        collector.waitUntilAllPutReceived(3);
+        putCollector.waitUntilAllReceived(3);
         connectionManager.closeChannels(channels);
     }
 
@@ -58,12 +60,12 @@ public class ClientService extends TupleSpacesReplicaGrpc.TupleSpacesReplicaImpl
             stubs.get(id)
                     .read(
                             ReadRequest.newBuilder().setSearchPattern(searchPattern).build(),
-                            new ResponseObserver(collector)
+                            new ResponseObserver<ReadResponse>(readCollector)
                     );
         }
-        collector.waitUntilAllReadReceived(1);
+        readCollector.waitUntilAllReceived(1);
         connectionManager.closeChannels(channels);
-        return collector.getReadStrings();
+        return readCollector.getResponse();
     }
 
     public String take(String searchPattern) throws StatusRuntimeException {
@@ -81,9 +83,7 @@ public class ClientService extends TupleSpacesReplicaGrpc.TupleSpacesReplicaImpl
         return null;
     }
 
-    public List<String> getTupleSpacesState(
-            String qualifier
-    ) throws StatusRuntimeException {
+    public List<String> getTupleSpacesState(String qualifier) throws StatusRuntimeException {
         ManagedChannel channel = nameServerService.getChannel(qualifier);
         TupleSpacesReplicaBlockingStub stub = connectionManager.resolveBlockingStub(channel);
 
@@ -93,7 +93,6 @@ public class ClientService extends TupleSpacesReplicaGrpc.TupleSpacesReplicaImpl
 
         connectionManager.closeChannel(channel);
         return response.getTupleList();
-
     }
 
     /**
@@ -112,10 +111,6 @@ public class ClientService extends TupleSpacesReplicaGrpc.TupleSpacesReplicaImpl
      */
     public void setDelay(int id, int delay) {
         delayer.setDelay(id, delay);
-    }
-
-    public int getId() {
-        return ID;
     }
 
 }

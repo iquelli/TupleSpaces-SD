@@ -16,14 +16,14 @@ public class ResponseObserver<T> implements StreamObserver<T> {
     @Override
     public void onNext(T response) {
         if (response instanceof ReadResponse) {
-            ReadResponse typedResponse = (ReadResponse) response;
+            ReadResponse readResponse = (ReadResponse) response;
             // Now you can work with typedResponse
-            collector.addReadString(typedResponse.getResult());
-            Logger.info("Received response from read request");
+            collector.addResponse(readResponse.getResult());
+            Logger.debug("Received response from read request");
         } else if (response instanceof PutResponse) {
             // Handle other cases or log a message
-            collector.addPutString("OK");
-            Logger.info("Received response from put request");
+            collector.addResponse("OK");
+            Logger.debug("Received response from put request");
         } else {
             Logger.error("Received unexpected response type: " + response.getClass());
         }
@@ -36,7 +36,7 @@ public class ResponseObserver<T> implements StreamObserver<T> {
 
     @Override
     public void onCompleted() {
-        Logger.info("Request completed");
+        Logger.debug("Request completed");
     }
 
 }

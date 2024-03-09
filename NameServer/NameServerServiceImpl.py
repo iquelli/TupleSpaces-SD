@@ -35,11 +35,6 @@ class ServiceEntry:
             raise UnsuccessfulServerRegisterException
         self.servers.append(server_entry)
 
-    def search_for_servers(self, qualifier):
-        if not validate_qualifier(qualifier):
-            raise InvalidServerArgumentsException
-        return any(server for server in self.servers if server.qualifier == qualifier)
-
     def get_servers(self):
         return self.servers
 

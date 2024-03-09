@@ -3,6 +3,8 @@ package pt.ulisboa.tecnico.tuplespaces.server;
 import io.grpc.BindableService;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
+import io.grpc.Status;
+import io.grpc.StatusRuntimeException;
 import pt.ulisboa.tecnico.tuplespaces.common.Logger;
 import pt.ulisboa.tecnico.tuplespaces.common.grpc.NameServerService;
 import pt.ulisboa.tecnico.tuplespaces.server.service.TupleSpacesReplicaXuLiskovServiceImpl;
@@ -57,25 +59,24 @@ public class ServerMain {
             System.exit(1);
         }
 
-        // TODO: Revisit this for the Replica Xu Liskov variant
-        // try {
-        //     nameServerService.register(port, qualifier);
-        // } catch (StatusRuntimeException e) {
-        //     if (e.getStatus().getCode() == Status.Code.UNAVAILABLE) {
-        //         Logger.error("Name server is unreachable");
-        //     } else {
-        //         Logger.error(e.getStatus().getDescription());
-        //     }
-        //     System.exit(1);
-        // }
+        try {
+            nameServerService.register(port, qualifier);
+        } catch (StatusRuntimeException e) {
+            if (e.getStatus().getCode() == Status.Code.UNAVAILABLE) {
+                Logger.error("Name server is unreachable");
+            } else {
+                Logger.error(e.getStatus().getDescription());
+            }
+            System.exit(1);
+        }
 
-        // Logger.info("TupleSpaces server has started%n");
+        Logger.info("TupleSpaces server has started%n");
 
-        // Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-        //     Logger.info("TupleSpaces server is shutting down");
-        //     nameServerService.delete(port);
-        //     nameServerService.close();
-        // }));
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            Logger.info("TupleSpaces server is shutting down");
+            nameServerService.delete(port);
+            nameServerService.close();
+        }));
 
         // Do not exit the main thread. Wait until server is terminated.
         server.awaitTermination();

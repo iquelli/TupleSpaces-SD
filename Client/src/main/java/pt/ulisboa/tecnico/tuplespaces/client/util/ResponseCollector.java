@@ -1,51 +1,37 @@
 package pt.ulisboa.tecnico.tuplespaces.client.util;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class ResponseCollector {
 
-    ArrayList<String> readResponses;
-    ArrayList<String> putResponses;
+    List<String> responses;
 
     public ResponseCollector() {
-        readResponses = new ArrayList<String>();
-        putResponses = new ArrayList<String>();
+        responses = new ArrayList<String>();
     }
 
-    synchronized public void addReadString(String s) {
-        readResponses.add(s);
+    synchronized public void addResponse(String s) {
+        responses.add(s);
         notifyAll();
     }
 
-    synchronized public void addPutString(String s) {
-        putResponses.add(s);
-        notifyAll();
-    }
-
-    synchronized public String getReadStrings() {
+    synchronized public String getResponse() {
         String res = new String();
-        for (String s : readResponses) {
+        for (String s : responses) {
             res = res.concat(s);
         }
         return res;
     }
 
-    synchronized public String getPutStrings() {
-        String res = new String();
-        for (String s : putResponses) {
-            res = res.concat(s);
+    synchronized public List<String> getResponses() {
+        return this.responses;
+    }
+
+    synchronized public void waitUntilAllReceived(int n) throws InterruptedException {
+        while (responses.size() < n) {
+            wait();
         }
-        return res;
-    }
-
-    synchronized public void waitUntilAllReadReceived(int n) throws InterruptedException {
-        while (readResponses.size() < n)
-            wait();
-    }
-
-    synchronized public void waitUntilAllPutReceived(int n) throws InterruptedException {
-        while (putResponses.size() < n)
-            wait();
     }
 
 }

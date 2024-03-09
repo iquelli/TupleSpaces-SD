@@ -85,8 +85,7 @@ public class NameServerService implements AutoCloseable {
     }
 
     public ManagedChannel getChannel(String qualifier) throws StatusRuntimeException {
-
-        // To connect to servera
+        // To connect to server
         ServerAddress address = this.lookup(qualifier);
         String host = address.getHost();
         int port = address.getPort();
