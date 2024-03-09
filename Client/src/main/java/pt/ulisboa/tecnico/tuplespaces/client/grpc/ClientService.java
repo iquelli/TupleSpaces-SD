@@ -1,18 +1,17 @@
 package pt.ulisboa.tecnico.tuplespaces.client.grpc;
 
+import io.grpc.ManagedChannel;
 import io.grpc.StatusRuntimeException;
+import pt.ulisboa.tecnico.tuplespaces.client.util.ConnectionManager;
 import pt.ulisboa.tecnico.tuplespaces.client.util.OrderedDelayer;
 import pt.ulisboa.tecnico.tuplespaces.client.util.ResponseCollector;
 import pt.ulisboa.tecnico.tuplespaces.client.util.ResponseObserver;
 import pt.ulisboa.tecnico.tuplespaces.common.grpc.NameServerService;
 import pt.ulisboa.tecnico.tuplespaces.replicaXuLiskov.contract.TupleSpacesReplicaGrpc;
+import pt.ulisboa.tecnico.tuplespaces.replicaXuLiskov.contract.TupleSpacesReplicaGrpc.TupleSpacesReplicaBlockingStub;
 import pt.ulisboa.tecnico.tuplespaces.replicaXuLiskov.contract.TupleSpacesReplicaGrpc.TupleSpacesReplicaStub;
 import pt.ulisboa.tecnico.tuplespaces.replicaXuLiskov.contract.TupleSpacesReplicaXuLiskov.PutRequest;
 import pt.ulisboa.tecnico.tuplespaces.replicaXuLiskov.contract.TupleSpacesReplicaXuLiskov.ReadRequest;
-import pt.ulisboa.tecnico.tuplespaces.replicaXuLiskov.contract.TupleSpacesReplicaXuLiskov.ReadResponse;
-
-
-
 
 import java.util.List;
 
@@ -21,6 +20,7 @@ public class ClientService extends TupleSpacesReplicaGrpc.TupleSpacesReplicaImpl
     NameServerService nameServerService;
     OrderedDelayer delayer;
     ResponseCollector collector;
+    ConnectionManager connectionManager;
 
     public ClientService(NameServerService nameServerService, int numServers) {
         this.nameServerService = nameServerService;
@@ -31,25 +31,37 @@ public class ClientService extends TupleSpacesReplicaGrpc.TupleSpacesReplicaImpl
     }
 
     public void put(String newTuple) throws StatusRuntimeException, InterruptedException {
-        List<TupleSpacesReplicaStub> stubs = nameServerService.connectToServers();
+        List<ManagedChannel> channels = nameServerService.getServersChannels();
+        List<TupleSpacesReplicaStub> stubs = connectionManager.resolveMultipleStubs(channels);
         for (int id : delayer) {
-            stubs.get(id).put(PutRequest.newBuilder().setNewTuple(newTuple).build(), new ResponseObserver(collector));
+            stubs.get(id)
+                    .put(
+                            PutRequest.newBuilder().setNewTuple(newTuple).build(),
+                            new ResponseObserver(collector)
+                    );
         }
         collector.waitUntilAllPutReceived(3);
+        connectionManager.closeChannels(channels);
     }
 
     public String read(String searchPattern) throws StatusRuntimeException, InterruptedException {
-        List<TupleSpacesReplicaStub> stubs = nameServerService.connectToServers();
+        List<ManagedChannel> channels = nameServerService.getServersChannels();
+        List<TupleSpacesReplicaStub> stubs = connectionManager.resolveMultipleStubs(channels);
         for (int id : delayer) {
-            stubs.get(id).read(ReadRequest.newBuilder().setSearchPattern(searchPattern).build(), new ResponseObserver(collector));
+            stubs.get(id)
+                    .read(
+                            ReadRequest.newBuilder().setSearchPattern(searchPattern).build(),
+                            new ResponseObserver(collector)
+                    );
         }
         collector.waitUntilAllReadReceived(1);
-
+        connectionManager.closeChannels(channels);
         return collector.getReadStrings();
     }
 
     public String take(String searchPattern) throws StatusRuntimeException {
-        List<TupleSpacesReplicaStub> stubs = nameServerService.connectToServers();
+        List<ManagedChannel> channels = nameServerService.getServersChannels();
+        List<TupleSpacesReplicaStub> stubs = connectionManager.resolveMultipleStubs(channels);
         for (int id : delayer) {
             // TakeResponse response = stubs[id].take(
             //         TakeRequest.newBuilder().setSearchPattern(searchPattern).build()
@@ -57,6 +69,7 @@ public class ClientService extends TupleSpacesReplicaGrpc.TupleSpacesReplicaImpl
             // TODO: adjust take for multiple servers
         }
 
+        connectionManager.closeChannels(channels);
         // return response.getResult();
         return null;
     }
@@ -64,7 +77,9 @@ public class ClientService extends TupleSpacesReplicaGrpc.TupleSpacesReplicaImpl
     public List<String> getTupleSpacesState(
             String qualifier
     ) throws StatusRuntimeException {
-        List<TupleSpacesReplicaStub> stubs = nameServerService.connectToServers();
+        ManagedChannel channel = nameServerService.getChannel(qualifier);
+        TupleSpacesReplicaBlockingStub stub = connectionManager.resolveBlockingStub(channel);
+
         for (int id : delayer) {
             // getTupleSpacesStateResponse response = stubs[id].getTupleSpacesState(
             //         getTupleSpacesStateRequest.newBuilder().build()
@@ -73,6 +88,7 @@ public class ClientService extends TupleSpacesReplicaGrpc.TupleSpacesReplicaImpl
         }
 
         // return response.getTupleList();
+        connectionManager.closeChannel(channel);
         return null;
     }
 

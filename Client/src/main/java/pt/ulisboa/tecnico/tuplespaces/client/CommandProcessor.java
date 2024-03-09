@@ -83,7 +83,7 @@ public class CommandProcessor {
         }
     }
 
-    private void put(String[] split) throws InterruptedException{
+    private void put(String[] split) throws InterruptedException {
         // check if input is valid
         if (!this.inputIsValid(split)) {
             this.printUsage();
@@ -97,7 +97,7 @@ public class CommandProcessor {
         System.out.println("OK");
     }
 
-    private void read(String[] split) throws InterruptedException{
+    private void read(String[] split) throws InterruptedException {
         // check if input is valid
         if (!this.inputIsValid(split)) {
             this.printUsage();
