@@ -112,7 +112,7 @@ public class CommandProcessor {
         System.out.println(responseTuple);
     }
 
-    private void take(String[] split) {
+    private void take(String[] split) throws InterruptedException {
         // check if input is valid
         if (!this.inputIsValid(split)) {
             this.printUsage();

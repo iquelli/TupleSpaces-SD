@@ -14,6 +14,8 @@ import pt.ulisboa.tecnico.tuplespaces.replicaXuLiskov.contract.TupleSpacesReplic
 import pt.ulisboa.tecnico.tuplespaces.replicaXuLiskov.contract.TupleSpacesReplicaXuLiskov.PutResponse;
 import pt.ulisboa.tecnico.tuplespaces.replicaXuLiskov.contract.TupleSpacesReplicaXuLiskov.ReadRequest;
 import pt.ulisboa.tecnico.tuplespaces.replicaXuLiskov.contract.TupleSpacesReplicaXuLiskov.ReadResponse;
+import pt.ulisboa.tecnico.tuplespaces.replicaXuLiskov.contract.TupleSpacesReplicaXuLiskov.TakePhase1Request;
+import pt.ulisboa.tecnico.tuplespaces.replicaXuLiskov.contract.TupleSpacesReplicaXuLiskov.TakePhase1Response;
 import pt.ulisboa.tecnico.tuplespaces.replicaXuLiskov.contract.TupleSpacesReplicaXuLiskov.getTupleSpacesStateRequest;
 import pt.ulisboa.tecnico.tuplespaces.replicaXuLiskov.contract.TupleSpacesReplicaXuLiskov.getTupleSpacesStateResponse;
 
@@ -28,6 +30,7 @@ public class ClientService extends TupleSpacesReplicaGrpc.TupleSpacesReplicaImpl
 
     private ResponseCollector putCollector;
     private ResponseCollector readCollector;
+    private ResponseCollector takeCollector;
 
     public ClientService(NameServerService nameServerService, int numServers, int id) {
         this.ID = id;
@@ -68,18 +71,44 @@ public class ClientService extends TupleSpacesReplicaGrpc.TupleSpacesReplicaImpl
         return readCollector.getResponse();
     }
 
-    public String take(String searchPattern) throws StatusRuntimeException {
+    public String take(String searchPattern) throws StatusRuntimeException, InterruptedException {
         List<ManagedChannel> channels = nameServerService.getServersChannels();
         List<TupleSpacesReplicaStub> stubs = connectionManager.resolveMultipleStubs(channels);
-        for (int id : delayer) {
-            // TakeResponse response = stubs[id].take(
-            //         TakeRequest.newBuilder().setSearchPattern(searchPattern).build()
-            // );
-            // TODO: adjust take for multiple servers
+
+        while (true) {
+            List<String> phaseOneResponses = takePhaseOne(stubs, searchPattern);
+            // TODO: add condition here to break the loop
+            break;
         }
+
+        // Send release request
+
+        // Initialize Take phase 2
 
         connectionManager.closeChannels(channels);
         // return response.getResult();
+        return null;
+    }
+
+    public List<String> takePhaseOne(
+            List<TupleSpacesReplicaStub> stubs,
+            String searchPattern
+    ) throws StatusRuntimeException, InterruptedException {
+
+        for (int id : delayer) {
+            stubs.get(id)
+                    .takePhase1(
+                            TakePhase1Request.newBuilder().setSearchPattern(searchPattern).build(),
+                            new ResponseObserver<TakePhase1Response>(takeCollector)
+                    );
+        }
+
+        takeCollector.waitUntilAllReceived(3);
+        return takeCollector.getResponses();
+    }
+
+    public String takePhaseTwo(String searchPattern) throws StatusRuntimeException {
+        // TODO: complete phase two
         return null;
     }
 
