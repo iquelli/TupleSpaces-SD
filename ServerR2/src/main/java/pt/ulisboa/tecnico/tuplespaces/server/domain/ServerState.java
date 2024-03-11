@@ -109,10 +109,10 @@ public class ServerState {
         }
     }
 
-    public String unlock(
+    public void unlock(
             String pattern,
             int clientId
-    ) throws InvalidClientIDException, InvalidTupleException {
+    ) throws InvalidClientIDException, InvalidTupleException, TupleNotFoundException {
         if (clientId < 0) {
             throw new InvalidClientIDException(clientId);
         }
@@ -140,7 +140,6 @@ public class ServerState {
         if (!found) {
             throw new TupleNotFoundException(pattern, clientId);
         }
-        return pattern;
     }
 
     public List<String> getTupleSpacesState() {

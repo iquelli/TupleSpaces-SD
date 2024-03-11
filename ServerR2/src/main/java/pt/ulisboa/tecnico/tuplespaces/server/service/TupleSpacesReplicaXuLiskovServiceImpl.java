@@ -17,7 +17,9 @@ import pt.ulisboa.tecnico.tuplespaces.replicaXuLiskov.contract.TupleSpacesReplic
 import pt.ulisboa.tecnico.tuplespaces.replicaXuLiskov.contract.TupleSpacesReplicaXuLiskov.getTupleSpacesStateRequest;
 import pt.ulisboa.tecnico.tuplespaces.replicaXuLiskov.contract.TupleSpacesReplicaXuLiskov.getTupleSpacesStateResponse;
 import pt.ulisboa.tecnico.tuplespaces.server.domain.ServerState;
+import pt.ulisboa.tecnico.tuplespaces.server.exceptions.InvalidClientIDException;
 import pt.ulisboa.tecnico.tuplespaces.server.exceptions.InvalidTupleException;
+import pt.ulisboa.tecnico.tuplespaces.server.exceptions.TupleNotFoundException;
 
 import java.util.List;
 
@@ -43,12 +45,12 @@ public class TupleSpacesReplicaXuLiskovServiceImpl extends TupleSpacesReplicaGrp
             responseObserver.onNext(PutResponse.getDefaultInstance());
             responseObserver.onCompleted();
         } catch (InvalidTupleException e) {
-            Logger.debug("[ERR] PUT operation failed:%s", e.getMessage());
+            Logger.debug("[ERR] PUT operation failed: %s", e.getMessage());
             responseObserver.onError(
                     Status.INVALID_ARGUMENT.withDescription(e.getMessage()).asRuntimeException()
             );
         } catch (RuntimeException e) {
-            Logger.debug("[ERR] PUT operation failed:%s", e.getMessage());
+            Logger.debug("[ERR] PUT operation failed: %s", e.getMessage());
             responseObserver.onError(
                     Status.UNKNOWN.withDescription(e.getMessage()).asRuntimeException()
             );
@@ -66,19 +68,19 @@ public class TupleSpacesReplicaXuLiskovServiceImpl extends TupleSpacesReplicaGrp
             responseObserver.onNext(response);
             responseObserver.onCompleted();
         } catch (InvalidTupleException e) {
-            Logger.debug("[ERR] READ operation failed:%s", e.getMessage());
+            Logger.debug("[ERR] READ operation failed: %s", e.getMessage());
             responseObserver.onError(
                     Status.INVALID_ARGUMENT.withDescription(e.getMessage()).asRuntimeException()
             );
         } catch (InterruptedException e) {
-            Logger.debug("[ERR] READ operation failed:%s", e.getMessage());
+            Logger.debug("[ERR] READ operation failed: %s", e.getMessage());
             responseObserver.onError(
                     Status.CANCELLED.withDescription(
                             "Client interrupted while waiting for tuple: " + e.getMessage()
                     ).asRuntimeException()
             );
         } catch (RuntimeException e) {
-            Logger.debug("[ERR] READ operation failed:%s", e.getMessage());
+            Logger.debug("[ERR] READ operation failed: %s", e.getMessage());
             responseObserver.onError(
                     Status.UNKNOWN.withDescription(e.getMessage()).asRuntimeException()
             );
@@ -90,7 +92,41 @@ public class TupleSpacesReplicaXuLiskovServiceImpl extends TupleSpacesReplicaGrp
             TakePhase1Request request,
             StreamObserver<TakePhase1Response> responseObserver
     ) {
-        // TODO: take phase 1 service
+        try {
+            Logger.debug("[INFO] Received TAKE_PHASE_1 request:%n%s", request);
+            List<String> tuples = state.lock(request.getSearchPattern(), request.getClientId());
+
+            // Builder to construct a new Protobuffer object
+            TakePhase1Response response = TakePhase1Response.newBuilder()
+                    .addAllReservedTuples(tuples)
+                    .build();
+
+            // Use responseObserver to send a single response back
+            responseObserver.onNext(response);
+            responseObserver.onCompleted();
+        } catch (InvalidClientIDException e) {
+            Logger.debug("[ERR] TAKE_PHASE_1 operation failed: %s", e.getMessage());
+            responseObserver.onError(
+                    Status.INVALID_ARGUMENT.withDescription(e.getMessage()).asRuntimeException()
+            );
+        } catch (InvalidTupleException e) {
+            Logger.debug("[ERR] TAKE_PHASE_1 operation failed: %s", e.getMessage());
+            responseObserver.onError(
+                    Status.INVALID_ARGUMENT.withDescription(e.getMessage()).asRuntimeException()
+            );
+        } catch (InterruptedException e) {
+            Logger.debug("[ERR] TAKE_PHASE_1 operation failed: %s", e.getMessage());
+            responseObserver.onError(
+                    Status.CANCELLED.withDescription(
+                            "Client interrupted while waiting for tuple: " + e.getMessage()
+                    ).asRuntimeException()
+            );
+        } catch (RuntimeException e) {
+            Logger.debug("[ERR] TAKE_PHASE_1 operation failed: %s", e.getMessage());
+            responseObserver.onError(
+                    Status.UNKNOWN.withDescription(e.getMessage()).asRuntimeException()
+            );
+        }
     }
 
     @Override
@@ -98,7 +134,24 @@ public class TupleSpacesReplicaXuLiskovServiceImpl extends TupleSpacesReplicaGrp
             TakePhase1ReleaseRequest request,
             StreamObserver<TakePhase1ReleaseResponse> responseObserver
     ) {
-        // TODO: take phase 1 release service
+        try {
+            Logger.debug("[INFO] Received TAKE_PHASE_1_RELEASE request:%n%s", request);
+            state.release(request.getClientId());
+
+            // Use responseObserver to send a single response back
+            responseObserver.onNext(TakePhase1ReleaseResponse.getDefaultInstance());
+            responseObserver.onCompleted();
+        } catch (InvalidClientIDException e) {
+            Logger.debug("[ERR] TAKE_PHASE_1_RELEASE operation failed: %s", e.getMessage());
+            responseObserver.onError(
+                    Status.INVALID_ARGUMENT.withDescription(e.getMessage()).asRuntimeException()
+            );
+        } catch (RuntimeException e) {
+            Logger.debug("[ERR] TAKE_PHASE_1_RELEASE operation failed: %s", e.getMessage());
+            responseObserver.onError(
+                    Status.UNKNOWN.withDescription(e.getMessage()).asRuntimeException()
+            );
+        }
     }
 
     @Override
@@ -106,7 +159,34 @@ public class TupleSpacesReplicaXuLiskovServiceImpl extends TupleSpacesReplicaGrp
             TakePhase2Request request,
             StreamObserver<TakePhase2Response> responseObserver
     ) {
-        // TODO: take phase 2 service
+        try {
+            Logger.debug("[INFO] Received TAKE_PHASE_2 request:%n%s", request);
+            state.unlock(request.getTuple(), request.getClientId());
+
+            // Use responseObserver to send a single response back
+            responseObserver.onNext(TakePhase2Response.getDefaultInstance());
+            responseObserver.onCompleted();
+        } catch (InvalidClientIDException e) {
+            Logger.debug("[ERR] TAKE_PHASE_2 operation failed: %s", e.getMessage());
+            responseObserver.onError(
+                    Status.INVALID_ARGUMENT.withDescription(e.getMessage()).asRuntimeException()
+            );
+        } catch (InvalidTupleException e) {
+            Logger.debug("[ERR] TAKE_PHASE_2 operation failed: %s", e.getMessage());
+            responseObserver.onError(
+                    Status.INVALID_ARGUMENT.withDescription(e.getMessage()).asRuntimeException()
+            );
+        } catch (TupleNotFoundException e) {
+            Logger.debug("[ERR] TAKE_PHASE_2 operation failed: %s", e.getMessage());
+            responseObserver.onError(
+                    Status.NOT_FOUND.withDescription(e.getMessage()).asRuntimeException()
+            );
+        } catch (RuntimeException e) {
+            Logger.debug("[ERR] TAKE_PHASE_2 operation failed: %s", e.getMessage());
+            responseObserver.onError(
+                    Status.UNKNOWN.withDescription(e.getMessage()).asRuntimeException()
+            );
+        }
     }
 
     @Override
@@ -128,7 +208,7 @@ public class TupleSpacesReplicaXuLiskovServiceImpl extends TupleSpacesReplicaGrp
             responseObserver.onNext(response);
             responseObserver.onCompleted();
         } catch (RuntimeException e) {
-            Logger.debug("[ERR] GET_TUPLE_SPACE_STATE operation failed:%s", e.getMessage());
+            Logger.debug("[ERR] GET_TUPLE_SPACE_STATE operation failed: %s", e.getMessage());
             responseObserver.onError(
                     Status.UNKNOWN.withDescription(e.getMessage()).asRuntimeException()
             );
