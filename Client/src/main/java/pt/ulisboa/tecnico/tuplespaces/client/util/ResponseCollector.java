@@ -17,11 +17,10 @@ public class ResponseCollector {
     }
 
     synchronized public String getResponse() {
-        String res = new String();
-        for (String s : responses) {
-            res = res.concat(s);
+        if (responses.isEmpty()) {
+            return "";
         }
-        return res;
+        return responses.get(0);
     }
 
     synchronized public List<String> getResponses() {
