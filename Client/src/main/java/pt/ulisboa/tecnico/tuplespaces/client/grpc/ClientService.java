@@ -94,7 +94,6 @@ public class ClientService extends TupleSpacesReplicaGrpc.TupleSpacesReplicaImpl
             List<TupleSpacesReplicaStub> stubs,
             String searchPattern
     ) throws StatusRuntimeException, InterruptedException {
-
         for (int id : delayer) {
             stubs.get(id)
                     .takePhase1(
