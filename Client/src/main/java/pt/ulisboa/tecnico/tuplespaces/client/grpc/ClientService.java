@@ -5,7 +5,9 @@ import io.grpc.StatusRuntimeException;
 import pt.ulisboa.tecnico.tuplespaces.client.util.ConnectionManager;
 import pt.ulisboa.tecnico.tuplespaces.client.util.OrderedDelayer;
 import pt.ulisboa.tecnico.tuplespaces.client.util.ResponseCollector;
-import pt.ulisboa.tecnico.tuplespaces.client.util.ResponseObserver;
+import pt.ulisboa.tecnico.tuplespaces.client.util.ResponseObserverPut;
+import pt.ulisboa.tecnico.tuplespaces.client.util.ResponseObserverRead;
+import pt.ulisboa.tecnico.tuplespaces.client.util.ResponseObserverTake;
 import pt.ulisboa.tecnico.tuplespaces.common.grpc.NameServerService;
 import pt.ulisboa.tecnico.tuplespaces.replicaXuLiskov.contract.TupleSpacesReplicaGrpc;
 import pt.ulisboa.tecnico.tuplespaces.replicaXuLiskov.contract.TupleSpacesReplicaGrpc.TupleSpacesReplicaBlockingStub;
@@ -49,7 +51,7 @@ public class ClientService extends TupleSpacesReplicaGrpc.TupleSpacesReplicaImpl
             stubs.get(id)
                     .put(
                             PutRequest.newBuilder().setNewTuple(newTuple).build(),
-                            new ResponseObserver<PutResponse>(putCollector)
+                            new ResponseObserverPut(putCollector)
                     );
         }
         putCollector.waitUntilAllReceived(3);
@@ -63,7 +65,7 @@ public class ClientService extends TupleSpacesReplicaGrpc.TupleSpacesReplicaImpl
             stubs.get(id)
                     .read(
                             ReadRequest.newBuilder().setSearchPattern(searchPattern).build(),
-                            new ResponseObserver<ReadResponse>(readCollector)
+                            new ResponseObserverRead(readCollector)
                     );
         }
         readCollector.waitUntilAllReceived(1);
@@ -98,7 +100,7 @@ public class ClientService extends TupleSpacesReplicaGrpc.TupleSpacesReplicaImpl
             stubs.get(id)
                     .takePhase1(
                             TakePhase1Request.newBuilder().setSearchPattern(searchPattern).build(),
-                            new ResponseObserver<TakePhase1Response>(takeCollector)
+                            new ResponseObserverTake<TakePhase1Response>(takeCollector)
                     );
         }
 
