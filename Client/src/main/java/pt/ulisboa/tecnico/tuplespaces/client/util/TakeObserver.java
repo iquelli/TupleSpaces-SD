@@ -7,12 +7,10 @@ import pt.ulisboa.tecnico.tuplespaces.replicaXuLiskov.contract.TupleSpacesReplic
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class TakeObserver implements StreamObserver<TakePhase1Response> {
+public class TakeObserver extends ResponseObserver<TakePhase1Response> implements StreamObserver<TakePhase1Response> {
 
-    ResponseCollector collector;
-
-    public TakeObserver(ResponseCollector c) {
-        collector = c;
+    public TakeObserver(ResponseCollector collector) {
+        super(collector);
     }
 
     @Override
@@ -29,16 +27,6 @@ public class TakeObserver implements StreamObserver<TakePhase1Response> {
             );
         }
         Logger.debug("Received response from take phase 1 request");
-    }
-
-    @Override
-    public void onError(Throwable throwable) {
-        Logger.error("Received error: " + throwable);
-    }
-
-    @Override
-    public void onCompleted() {
-        Logger.debug("Request completed");
     }
 
 }

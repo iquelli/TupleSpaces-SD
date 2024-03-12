@@ -4,28 +4,16 @@ import io.grpc.stub.StreamObserver;
 import pt.ulisboa.tecnico.tuplespaces.common.Logger;
 import pt.ulisboa.tecnico.tuplespaces.replicaXuLiskov.contract.TupleSpacesReplicaXuLiskov.ReadResponse;
 
-public class ReadObserver implements StreamObserver<ReadResponse> {
+public class ReadObserver extends ResponseObserver<ReadResponse> implements StreamObserver<ReadResponse> {
 
-    ResponseCollector collector;
-
-    public ReadObserver(ResponseCollector c) {
-        collector = c;
+    public ReadObserver(ResponseCollector collector) {
+        super(collector);
     }
 
     @Override
     public void onNext(ReadResponse readResponse) {
         collector.addResponse(readResponse.getResult());
         Logger.debug("Received response from read request");
-    }
-
-    @Override
-    public void onError(Throwable throwable) {
-        Logger.error("Received error: " + throwable);
-    }
-
-    @Override
-    public void onCompleted() {
-        Logger.debug("Request completed");
     }
 
 }
