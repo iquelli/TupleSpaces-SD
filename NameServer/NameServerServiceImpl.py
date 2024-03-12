@@ -31,8 +31,9 @@ class ServiceEntry:
         self.servers = []
 
     def add_server(self, server_entry):
-        if (any(server_entry.qualifier == s.qualifier for s in self.servers)
-            or any(server_entry.port == s.port for s in self.servers)):
+        if any(server_entry.qualifier == s.qualifier for s in self.servers) or any(
+            server_entry.port == s.port for s in self.servers
+        ):
             raise UnsuccessfulServerRegisterException
         self.servers.append(server_entry)
 

@@ -23,8 +23,8 @@ import pt.ulisboa.tecnico.tuplespaces.replicaXuLiskov.contract.TupleSpacesReplic
 import pt.ulisboa.tecnico.tuplespaces.replicaXuLiskov.contract.TupleSpacesReplicaXuLiskov.getTupleSpacesStateRequest;
 import pt.ulisboa.tecnico.tuplespaces.replicaXuLiskov.contract.TupleSpacesReplicaXuLiskov.getTupleSpacesStateResponse;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 public class ClientService extends TupleSpacesReplicaGrpc.TupleSpacesReplicaImplBase {
 

@@ -25,7 +25,7 @@ public class ResponseCollector {
         notifyAll();
     }
 
-    synchronized public void intersectResponses(List<String> responses)  {
+    synchronized public void intersectResponses(List<String> responses) {
         this.responses.retainAll(responses);
         ++nResponses;
         notifyAll();
