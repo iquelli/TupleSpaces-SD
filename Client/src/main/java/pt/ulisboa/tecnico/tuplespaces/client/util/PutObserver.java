@@ -4,11 +4,11 @@ import io.grpc.stub.StreamObserver;
 import pt.ulisboa.tecnico.tuplespaces.common.Logger;
 import pt.ulisboa.tecnico.tuplespaces.replicaXuLiskov.contract.TupleSpacesReplicaXuLiskov.PutResponse;
 
-public class ResponseObserverPut implements StreamObserver<PutResponse> {
+public class PutObserver implements StreamObserver<PutResponse> {
 
     ResponseCollector collector;
 
-    public ResponseObserverPut(ResponseCollector c) {
+    public PutObserver(ResponseCollector c) {
         collector = c;
     }
 

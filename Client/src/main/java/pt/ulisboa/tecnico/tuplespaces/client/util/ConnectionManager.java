@@ -12,18 +12,18 @@ import java.util.List;
 public class ConnectionManager {
 
     public ConnectionManager() {
-
+        // do nothing
     }
 
     public TupleSpacesReplicaStub resolveStub(ManagedChannel channel) {
         TupleSpacesReplicaStub stub = TupleSpacesReplicaGrpc.newStub(channel);
-        Logger.debug("Connected to server");
+        Logger.debug("Connected to server using non-blocking stub");
         return stub;
     }
 
     public TupleSpacesReplicaBlockingStub resolveBlockingStub(ManagedChannel channel) {
         TupleSpacesReplicaBlockingStub stub = TupleSpacesReplicaGrpc.newBlockingStub(channel);
-        Logger.debug("Connected to server");
+        Logger.debug("Connected to server using blocking stub");
         return stub;
     }
 

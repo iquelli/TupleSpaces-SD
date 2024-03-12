@@ -4,8 +4,8 @@ import pt.ulisboa.tecnico.tuplespaces.client.grpc.ClientService;
 import pt.ulisboa.tecnico.tuplespaces.common.Logger;
 import pt.ulisboa.tecnico.tuplespaces.common.grpc.NameServerService;
 
-import java.util.Random;
 import java.util.OptionalInt;
+import java.util.Random;
 
 public class ClientMain {
 
@@ -14,13 +14,15 @@ public class ClientMain {
     public static void main(String[] args) {
         Logger.debug("Hello Client!");
 
-        if (args.length > 1){
+        if (args.length > 1) {
             Logger.error("Usage: mvn exec:java < -Dexec.args=\"<client id>\" >");
             System.exit(1);
         }
 
         // Check arguments
-        final OptionalInt optClientID = (args.length != 0) ? parseClientID(args[0]) : findRandomClientID();
+        final OptionalInt optClientID = (args.length != 0)
+                ? parseClientID(args[0])
+                : findRandomClientID();
 
         if (optClientID.isEmpty()) {
             Logger.error("The client id must be a not negative integer");
@@ -70,6 +72,6 @@ public class ClientMain {
         Random random = new Random(seed);
 
         return OptionalInt.of(random.nextInt(Integer.MAX_VALUE));
-
     }
+
 }

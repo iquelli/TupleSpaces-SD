@@ -42,17 +42,6 @@ public class ServerState {
         return null;
     }
 
-    private boolean getMatchingTuples(String pattern, int clientId, List<String> tupleFormats) {
-        for (Tuple tuple : this.tuples) {
-            String format = tuple.getFormat();
-            if ((!tuple.isLocked() || tuple.isLockedBy(clientId)) && format.matches(pattern)) {
-                tuple.lock(clientId);
-                tupleFormats.add(format);
-            }
-        }
-        return !tupleFormats.isEmpty();
-    }
-
     public String read(String pattern) throws InvalidTupleException, InterruptedException {
         if (!checkFormat(pattern)) {
             throw new InvalidTupleException(pattern);
@@ -73,28 +62,32 @@ public class ServerState {
     public List<String> lock(
             String pattern,
             int clientId
-    ) throws InvalidClientIDException, InvalidTupleException, InterruptedException {
-        if (clientId < 0) {
-            throw new InvalidClientIDException(clientId);
-        }
+    ) throws InvalidClientIDException, InvalidTupleException {
         if (!checkFormat(pattern)) {
             throw new InvalidTupleException(pattern);
         }
+        if (clientId < 0) {
+            throw new InvalidClientIDException(clientId);
+        }
 
         // We look in the tuple space for all the tuples with the given format, and lock the
-        // ones that are possible. If there are zero tuple formats that match, it waits until at
-        // least one exists.
+        // ones that are possible.
         // Finally we return them in the tupleFormats list.
         List<String> tupleFormats = new ArrayList<>();
         synchronized (this.tuples) {
-            while (!getMatchingTuples(pattern, clientId, tupleFormats)) {
-                this.tuples.wait();
+            for (Tuple tuple : this.tuples) {
+                String format = tuple.getFormat();
+                if ((!tuple.isLocked() || tuple.isLockedBy(clientId)) && format.matches(pattern) &&
+                        !tupleFormats.contains(format)) {
+                    tuple.lock(clientId);
+                    tupleFormats.add(format);
+                }
             }
         }
         return tupleFormats;
     }
 
-    public void release(int clientId) throws InvalidClientIDException {
+    public void release(int clientId) throws InvalidClientIDException, InterruptedException {
         if (clientId < 0) {
             throw new InvalidClientIDException(clientId);
         }
@@ -106,6 +99,8 @@ public class ServerState {
                     tuple.unlock();
                 }
             }
+            // Wait for new put before triggering new response from the client
+            this.tuples.wait();
         }
     }
 
@@ -113,18 +108,18 @@ public class ServerState {
             String pattern,
             int clientId
     ) throws InvalidClientIDException, InvalidTupleException, TupleNotFoundException {
-        if (clientId < 0) {
-            throw new InvalidClientIDException(clientId);
-        }
         if (!checkFormat(pattern)) {
             throw new InvalidTupleException(pattern);
         }
+        if (clientId < 0) {
+            throw new InvalidClientIDException(clientId);
+        }
 
         boolean found = false;
-        int size = this.tuples.size();
         synchronized (this.tuples) {
             // Unlock every tuple locked by the client with the given id and return
             // the tuple requested by said user
+            int size = this.tuples.size();
             for (int i = 0; i < size; ++i) {
                 Tuple tuple = this.tuples.get(i);
                 if (tuple.isLockedBy(clientId)) {

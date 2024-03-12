@@ -4,20 +4,17 @@ import io.grpc.ManagedChannel;
 import io.grpc.StatusRuntimeException;
 import pt.ulisboa.tecnico.tuplespaces.client.util.ConnectionManager;
 import pt.ulisboa.tecnico.tuplespaces.client.util.OrderedDelayer;
+import pt.ulisboa.tecnico.tuplespaces.client.util.PutObserver;
+import pt.ulisboa.tecnico.tuplespaces.client.util.ReadObserver;
 import pt.ulisboa.tecnico.tuplespaces.client.util.ResponseCollector;
-import pt.ulisboa.tecnico.tuplespaces.client.util.ResponseObserverPut;
-import pt.ulisboa.tecnico.tuplespaces.client.util.ResponseObserverRead;
-import pt.ulisboa.tecnico.tuplespaces.client.util.ResponseObserverTake;
+import pt.ulisboa.tecnico.tuplespaces.client.util.TakeObserver;
 import pt.ulisboa.tecnico.tuplespaces.common.grpc.NameServerService;
 import pt.ulisboa.tecnico.tuplespaces.replicaXuLiskov.contract.TupleSpacesReplicaGrpc;
 import pt.ulisboa.tecnico.tuplespaces.replicaXuLiskov.contract.TupleSpacesReplicaGrpc.TupleSpacesReplicaBlockingStub;
 import pt.ulisboa.tecnico.tuplespaces.replicaXuLiskov.contract.TupleSpacesReplicaGrpc.TupleSpacesReplicaStub;
 import pt.ulisboa.tecnico.tuplespaces.replicaXuLiskov.contract.TupleSpacesReplicaXuLiskov.PutRequest;
-import pt.ulisboa.tecnico.tuplespaces.replicaXuLiskov.contract.TupleSpacesReplicaXuLiskov.PutResponse;
 import pt.ulisboa.tecnico.tuplespaces.replicaXuLiskov.contract.TupleSpacesReplicaXuLiskov.ReadRequest;
-import pt.ulisboa.tecnico.tuplespaces.replicaXuLiskov.contract.TupleSpacesReplicaXuLiskov.ReadResponse;
 import pt.ulisboa.tecnico.tuplespaces.replicaXuLiskov.contract.TupleSpacesReplicaXuLiskov.TakePhase1Request;
-import pt.ulisboa.tecnico.tuplespaces.replicaXuLiskov.contract.TupleSpacesReplicaXuLiskov.TakePhase1Response;
 import pt.ulisboa.tecnico.tuplespaces.replicaXuLiskov.contract.TupleSpacesReplicaXuLiskov.getTupleSpacesStateRequest;
 import pt.ulisboa.tecnico.tuplespaces.replicaXuLiskov.contract.TupleSpacesReplicaXuLiskov.getTupleSpacesStateResponse;
 
@@ -51,7 +48,7 @@ public class ClientService extends TupleSpacesReplicaGrpc.TupleSpacesReplicaImpl
             stubs.get(id)
                     .put(
                             PutRequest.newBuilder().setNewTuple(newTuple).build(),
-                            new ResponseObserverPut(putCollector)
+                            new PutObserver(putCollector)
                     );
         }
         putCollector.waitUntilAllReceived(3);
@@ -65,7 +62,7 @@ public class ClientService extends TupleSpacesReplicaGrpc.TupleSpacesReplicaImpl
             stubs.get(id)
                     .read(
                             ReadRequest.newBuilder().setSearchPattern(searchPattern).build(),
-                            new ResponseObserverRead(readCollector)
+                            new ReadObserver(readCollector)
                     );
         }
         readCollector.waitUntilAllReceived(1);
@@ -100,7 +97,7 @@ public class ClientService extends TupleSpacesReplicaGrpc.TupleSpacesReplicaImpl
             stubs.get(id)
                     .takePhase1(
                             TakePhase1Request.newBuilder().setSearchPattern(searchPattern).build(),
-                            new ResponseObserverTake<TakePhase1Response>(takeCollector)
+                            new TakeObserver(takeCollector)
                     );
         }
 
