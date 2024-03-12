@@ -33,9 +33,9 @@ public class ClientService extends TupleSpacesReplicaGrpc.TupleSpacesReplicaImpl
     private ConnectionManager connectionManager;
     private OrderedDelayer delayer;
 
-    private ResponseCollector putCollector;
-    private ResponseCollector readCollector;
-    private ResponseCollector takeCollector;
+    private ResponseCollector putCollector = new ResponseCollector();
+    private ResponseCollector readCollector = new ResponseCollector();
+    private ResponseCollector takeCollector = new ResponseCollector();
 
     public ClientService(NameServerService nameServerService, int numServers, int id) {
         this.ID = id;
