@@ -25,13 +25,13 @@ mvn clean install -q
 cd Contract
 mvn exec:exec -q
 
+cd $NAME_SERVER_PATH
+python server.py > /dev/null &
+
 cd $SERVER_PATH
 mvn exec:java -q -Dexec.args="2001 A" > /dev/null &
 mvn exec:java -q -Dexec.args="2002 B" > /dev/null &
 mvn exec:java -q -Dexec.args="2003 C" > /dev/null &
-
-cd $NAME_SERVER_PATH
-python server.py > /dev/null &
 
 cd $CLIENT_PATH
 for i in {1..6}; do
@@ -49,5 +49,5 @@ for i in {1..6}; do
     fi
 done
 
-killall python
 killall java
+killall python

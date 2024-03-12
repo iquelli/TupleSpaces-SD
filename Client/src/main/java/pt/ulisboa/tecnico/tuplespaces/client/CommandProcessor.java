@@ -20,6 +20,7 @@ public class CommandProcessor {
     private static final String SET_DELAY = "setdelay";
     private static final String EXIT = "exit";
     private static final String GET_TUPLE_SPACES_STATE = "getTupleSpacesState";
+    private static final String GET_TSS = "getTSS";
 
     private final ClientService clientService;
 
@@ -51,6 +52,7 @@ public class CommandProcessor {
                         this.take(split);
                         break;
                     case GET_TUPLE_SPACES_STATE:
+                    case GET_TSS:
                         this.getTupleSpacesState(split);
                         break;
                     case SLEEP:

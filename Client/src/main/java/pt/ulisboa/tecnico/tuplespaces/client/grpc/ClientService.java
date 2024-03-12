@@ -79,9 +79,10 @@ public class ClientService extends TupleSpacesReplicaGrpc.TupleSpacesReplicaImpl
                     );
         }
         readCollector.waitUntilAllReceived(1);
+        String tuple = readCollector.getResponse();
         readCollector.clearResponses();
         connectionManager.closeChannels(channels);
-        return readCollector.getResponse();
+        return tuple;
     }
 
     public String take(String searchPattern) throws StatusRuntimeException, InterruptedException {

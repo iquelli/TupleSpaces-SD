@@ -120,7 +120,7 @@ public class ServerState {
             // Unlock every tuple locked by the client with the given id and return
             // the tuple requested by said user
             int size = this.tuples.size();
-            for (int i = 0; i < size; ++i) {
+            for (int i = size - 1; i >= 0; --i) {
                 Tuple tuple = this.tuples.get(i);
                 if (tuple.isLockedBy(clientId)) {
                     if (tuple.getFormat().matches(pattern)) {
