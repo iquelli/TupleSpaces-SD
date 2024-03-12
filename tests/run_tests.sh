@@ -1,6 +1,9 @@
 #!/bin/sh
 
+ROOT_PATH=${PWD}/../
 CLIENT_PATH=${PWD}/../Client
+SERVER_PATH=${PWD}/../ServerR2
+NAME_SERVER_PATH=${PWD}/../NameServer
 TESTS_FOLDER=${PWD}
 TESTS_OUT_EXPECTED=${TESTS_FOLDER}/expected
 TESTS_OUTPUT=${TESTS_FOLDER}/test-outputs
@@ -17,6 +20,19 @@ fi
 rm -rf $TESTS_OUTPUT
 mkdir -p $TESTS_OUTPUT
 
+cd $ROOT_PATH
+mvn clean install -q
+cd Contract
+mvn exec:exec -q
+
+cd $SERVER_PATH
+mvn exec:java -q -Dexec.args="2001 A" > /dev/null &
+mvn exec:java -q -Dexec.args="2002 B" > /dev/null &
+mvn exec:java -q -Dexec.args="2003 C" > /dev/null &
+
+cd $NAME_SERVER_PATH
+python server.py > /dev/null &
+
 cd $CLIENT_PATH
 for i in {1..6}; do
     echo "-------------------------------------------------------------------------------"
@@ -32,3 +48,6 @@ for i in {1..6}; do
         echo "${GREEN}TEST [$TEST] PASSED${NC}"
     fi
 done
+
+killall python
+killall java

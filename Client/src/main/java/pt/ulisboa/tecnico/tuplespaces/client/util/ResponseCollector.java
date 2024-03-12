@@ -6,13 +6,28 @@ import java.util.List;
 public class ResponseCollector {
 
     List<String> responses;
+    int nResponses;
 
     public ResponseCollector() {
         responses = new ArrayList<String>();
+        nResponses = 0;
     }
 
     synchronized public void addResponse(String s) {
         responses.add(s);
+        ++nResponses;
+        notifyAll();
+    }
+
+    synchronized public void addAllResponses(List<String> responses) {
+        this.responses.addAll(responses);
+        ++nResponses;
+        notifyAll();
+    }
+
+    synchronized public void intersectResponses(List<String> responses)  {
+        this.responses.retainAll(responses);
+        ++nResponses;
         notifyAll();
     }
 
@@ -27,8 +42,9 @@ public class ResponseCollector {
         return this.responses;
     }
 
-    synchronized public void setResponses(List<String> responses) {
-        this.responses = responses;
+    synchronized public void clearResponses() {
+        this.responses.clear();
+        nResponses = 0;
     }
 
     synchronized public boolean isEmpty() {
@@ -36,7 +52,7 @@ public class ResponseCollector {
     }
 
     synchronized public void waitUntilAllReceived(int n) throws InterruptedException {
-        while (responses.size() < n) {
+        while (nResponses < n) {
             wait();
         }
     }

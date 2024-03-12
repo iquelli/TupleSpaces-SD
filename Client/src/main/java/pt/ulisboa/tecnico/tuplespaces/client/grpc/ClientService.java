@@ -24,7 +24,7 @@ import pt.ulisboa.tecnico.tuplespaces.replicaXuLiskov.contract.TupleSpacesReplic
 import pt.ulisboa.tecnico.tuplespaces.replicaXuLiskov.contract.TupleSpacesReplicaXuLiskov.getTupleSpacesStateResponse;
 
 import java.util.List;
-import java.util.Random;
+import java.util.ArrayList;
 
 public class ClientService extends TupleSpacesReplicaGrpc.TupleSpacesReplicaImplBase {
 
@@ -33,9 +33,9 @@ public class ClientService extends TupleSpacesReplicaGrpc.TupleSpacesReplicaImpl
     private ConnectionManager connectionManager;
     private OrderedDelayer delayer;
 
-    private ResponseCollector putCollector = new ResponseCollector();
-    private ResponseCollector readCollector = new ResponseCollector();
-    private ResponseCollector takeCollector = new ResponseCollector();
+    private ResponseCollector putCollector;
+    private ResponseCollector readCollector;
+    private ResponseCollector takeCollector;
 
     public ClientService(NameServerService nameServerService, int numServers, int id) {
         this.ID = id;
@@ -47,6 +47,10 @@ public class ClientService extends TupleSpacesReplicaGrpc.TupleSpacesReplicaImpl
          * different servers, according to the per-server delays that have been set
          */
         this.delayer = new OrderedDelayer(numServers);
+
+        this.putCollector = new ResponseCollector();
+        this.readCollector = new ResponseCollector();
+        this.takeCollector = new ResponseCollector();
     }
 
     public void put(String newTuple) throws StatusRuntimeException, InterruptedException {
@@ -60,6 +64,7 @@ public class ClientService extends TupleSpacesReplicaGrpc.TupleSpacesReplicaImpl
                     );
         }
         putCollector.waitUntilAllReceived(3);
+        putCollector.clearResponses();
         connectionManager.closeChannels(channels);
     }
 
@@ -74,6 +79,7 @@ public class ClientService extends TupleSpacesReplicaGrpc.TupleSpacesReplicaImpl
                     );
         }
         readCollector.waitUntilAllReceived(1);
+        readCollector.clearResponses();
         connectionManager.closeChannels(channels);
         return readCollector.getResponse();
     }
@@ -82,21 +88,20 @@ public class ClientService extends TupleSpacesReplicaGrpc.TupleSpacesReplicaImpl
         List<ManagedChannel> channels = nameServerService.getServersChannels();
         List<TupleSpacesReplicaStub> stubs = connectionManager.resolveMultipleStubs(channels);
 
-        List<String> phaseOneResponses;
+        List<String> lockedTuples = new ArrayList<>();
         while (true) {
-            phaseOneResponses = takePhaseOne(stubs, searchPattern);
-
-            if (!phaseOneResponses.isEmpty())
+            lockedTuples.addAll(takePhaseOne(stubs, searchPattern));
+            takeCollector.clearResponses();
+            if (!lockedTuples.isEmpty()) {
                 break; // got a tuple
+            }
 
             // Send release request
             takePhaseOneRelease(stubs);
         }
 
-        // pick a tuple
-        String selectedTuple = getRandomEntry(phaseOneResponses);
-
         // Initialize Take phase 2
+        String selectedTuple = lockedTuples.get(0);
         takePhaseTwo(stubs, selectedTuple);
 
         connectionManager.closeChannels(channels);
@@ -134,6 +139,7 @@ public class ClientService extends TupleSpacesReplicaGrpc.TupleSpacesReplicaImpl
         }
 
         takeCollector.waitUntilAllReceived(3);
+        takeCollector.clearResponses();
     }
 
     public void takePhaseTwo(
@@ -152,6 +158,7 @@ public class ClientService extends TupleSpacesReplicaGrpc.TupleSpacesReplicaImpl
         }
 
         takeCollector.waitUntilAllReceived(3);
+        takeCollector.clearResponses();
     }
 
     public List<String> getTupleSpacesState(String qualifier) throws StatusRuntimeException {
@@ -182,15 +189,6 @@ public class ClientService extends TupleSpacesReplicaGrpc.TupleSpacesReplicaImpl
      */
     public void setDelay(int id, int delay) {
         delayer.setDelay(id, delay);
-    }
-
-    /*
-     * This method allows to get a random entry from a list of strings.
-     */
-    private static String getRandomEntry(List<String> list) {
-        Random random = new Random();
-        int index = random.nextInt(list.size());
-        return list.get(index);
     }
 
 }

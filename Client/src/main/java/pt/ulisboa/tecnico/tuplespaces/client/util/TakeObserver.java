@@ -5,7 +5,6 @@ import pt.ulisboa.tecnico.tuplespaces.common.Logger;
 import pt.ulisboa.tecnico.tuplespaces.replicaXuLiskov.contract.TupleSpacesReplicaXuLiskov.TakePhase1Response;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class TakeObserver extends ResponseObserver<TakePhase1Response> implements StreamObserver<TakePhase1Response> {
 
@@ -18,13 +17,9 @@ public class TakeObserver extends ResponseObserver<TakePhase1Response> implement
         List<String> tuples = takeResponse.getReservedTuplesList();
 
         if (collector.isEmpty()) {
-            collector.setResponses(tuples);
+            collector.addAllResponses(tuples);
         } else {
-            collector.setResponses(
-                    tuples.stream()
-                            .filter(tuple -> collector.getResponses().contains(tuple))
-                            .collect(Collectors.toList())
-            );
+            collector.intersectResponses(tuples);
         }
         Logger.debug("Received response from take phase 1 request");
     }
