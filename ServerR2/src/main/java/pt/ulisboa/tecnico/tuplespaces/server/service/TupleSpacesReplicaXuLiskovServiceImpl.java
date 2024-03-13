@@ -62,6 +62,8 @@ public class TupleSpacesReplicaXuLiskovServiceImpl extends TupleSpacesReplicaGrp
         try {
             Logger.debug("[INFO] Received READ request:%n%s", request);
             String tuple = state.read(request.getSearchPattern());
+
+            // Builder to construct a new Protobuffer object
             ReadResponse response = ReadResponse.newBuilder().setResult(tuple).build();
 
             // Use responseObserver to send a single response back
