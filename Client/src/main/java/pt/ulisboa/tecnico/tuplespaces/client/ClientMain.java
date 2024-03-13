@@ -34,7 +34,7 @@ public class ClientMain {
 
         final NameServerService nameServerService = new NameServerService();
 
-        // create hook for ctrl+c 
+        // create hook for ctrl+c
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             nameServerService.close();
         }));

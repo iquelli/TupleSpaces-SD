@@ -58,13 +58,13 @@ public class ClientService extends TupleSpacesReplicaGrpc.TupleSpacesReplicaImpl
     public void put(String newTuple) throws StatusRuntimeException, InterruptedException {
         List<ManagedChannel> channels = nameServerService.getServersChannels();
         List<TupleSpacesReplicaStub> stubs = connectionManager.resolveMultipleStubs(channels);
-        
+
         for (int id : delayer) {
             stubs.get(id)
                     .put(
                             PutRequest.newBuilder()
-                                .setNewTuple(newTuple)
-                                .build(),
+                                    .setNewTuple(newTuple)
+                                    .build(),
                             new PutObserver(putCollector)
                     );
         }
@@ -77,20 +77,20 @@ public class ClientService extends TupleSpacesReplicaGrpc.TupleSpacesReplicaImpl
     public String read(String searchPattern) throws StatusRuntimeException, InterruptedException {
         List<ManagedChannel> channels = nameServerService.getServersChannels();
         List<TupleSpacesReplicaStub> stubs = connectionManager.resolveMultipleStubs(channels);
-        
+
         for (int id : delayer) {
             stubs.get(id)
                     .read(
                             ReadRequest.newBuilder()
-                                .setSearchPattern(searchPattern)
-                                .build(),
+                                    .setSearchPattern(searchPattern)
+                                    .build(),
                             new ReadObserver(readCollector)
                     );
         }
-        
+
         readCollector.waitUntilAllReceived(1);
         String tuple = readCollector.getResponse();
-        
+
         readCollector.clearResponses();
         connectionManager.closeChannels(channels);
         return tuple;
@@ -162,7 +162,7 @@ public class ClientService extends TupleSpacesReplicaGrpc.TupleSpacesReplicaImpl
             List<TupleSpacesReplicaStub> stubs,
             String selectedTuple
     ) throws StatusRuntimeException, InterruptedException {
-        
+
         for (int id : delayer) {
             stubs.get(id)
                     .takePhase2(
