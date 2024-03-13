@@ -15,18 +15,18 @@ public class ClientMain {
         Logger.debug("Hello Client!");
 
         if (args.length > 1) {
-            Logger.error("Usage: mvn exec:java < -Dexec.args=\"<client id>\" >");
+            Logger.error("Usage: mvn exec:java < -Dexec.args=\"<(optional) client id>\" >");
             System.exit(1);
         }
 
-        // Check arguments
+        // Check arguments. If no specified id, generate random one
         final OptionalInt optClientID = (args.length != 0)
                 ? parseClientID(args[0])
                 : findRandomClientID();
 
         if (optClientID.isEmpty()) {
             Logger.error("The client id must be a not negative integer");
-            Logger.error("Usage: mvn exec:java < -Dexec.args=\"<client id>\" >");
+            Logger.error("Usage: mvn exec:java < -Dexec.args=\"<(optional) client id>\" >");
             System.exit(1);
         }
 
@@ -34,10 +34,12 @@ public class ClientMain {
 
         final NameServerService nameServerService = new NameServerService();
 
+        // create hook for ctrl+c 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             nameServerService.close();
         }));
 
+        // start up client
         CommandProcessor parser = new CommandProcessor(
                 new ClientService(nameServerService, ClientMain.numServers, clientID)
         );
@@ -65,6 +67,11 @@ public class ClientMain {
         }
     }
 
+    /**
+     * Creates a random clientId number.
+     *
+     * @return An empty optional int of a randomly generated clientId
+     **/
     private static OptionalInt findRandomClientID() {
         long currentTimeMillis = System.currentTimeMillis();
         long nanoTime = System.nanoTime();

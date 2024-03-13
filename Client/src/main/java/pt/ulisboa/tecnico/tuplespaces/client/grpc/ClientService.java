@@ -40,6 +40,8 @@ public class ClientService extends TupleSpacesReplicaGrpc.TupleSpacesReplicaImpl
     public ClientService(NameServerService nameServerService, int numServers, int id) {
         this.ID = id;
         this.nameServerService = nameServerService;
+
+        // Creates stubs, closes channels
         this.connectionManager = new ConnectionManager();
 
         /*
@@ -56,13 +58,17 @@ public class ClientService extends TupleSpacesReplicaGrpc.TupleSpacesReplicaImpl
     public void put(String newTuple) throws StatusRuntimeException, InterruptedException {
         List<ManagedChannel> channels = nameServerService.getServersChannels();
         List<TupleSpacesReplicaStub> stubs = connectionManager.resolveMultipleStubs(channels);
+        
         for (int id : delayer) {
             stubs.get(id)
                     .put(
-                            PutRequest.newBuilder().setNewTuple(newTuple).build(),
+                            PutRequest.newBuilder()
+                                .setNewTuple(newTuple)
+                                .build(),
                             new PutObserver(putCollector)
                     );
         }
+
         putCollector.waitUntilAllReceived(3);
         putCollector.clearResponses();
         connectionManager.closeChannels(channels);
@@ -71,15 +77,20 @@ public class ClientService extends TupleSpacesReplicaGrpc.TupleSpacesReplicaImpl
     public String read(String searchPattern) throws StatusRuntimeException, InterruptedException {
         List<ManagedChannel> channels = nameServerService.getServersChannels();
         List<TupleSpacesReplicaStub> stubs = connectionManager.resolveMultipleStubs(channels);
+        
         for (int id : delayer) {
             stubs.get(id)
                     .read(
-                            ReadRequest.newBuilder().setSearchPattern(searchPattern).build(),
+                            ReadRequest.newBuilder()
+                                .setSearchPattern(searchPattern)
+                                .build(),
                             new ReadObserver(readCollector)
                     );
         }
+        
         readCollector.waitUntilAllReceived(1);
         String tuple = readCollector.getResponse();
+        
         readCollector.clearResponses();
         connectionManager.closeChannels(channels);
         return tuple;
@@ -94,7 +105,7 @@ public class ClientService extends TupleSpacesReplicaGrpc.TupleSpacesReplicaImpl
             lockedTuples.addAll(takePhaseOne(stubs, searchPattern));
             takeCollector.clearResponses();
             if (!lockedTuples.isEmpty()) {
-                break; // got a tuple
+                break; // got a tuple, can exit phase 1
             }
 
             // Send release request
@@ -113,6 +124,7 @@ public class ClientService extends TupleSpacesReplicaGrpc.TupleSpacesReplicaImpl
             List<TupleSpacesReplicaStub> stubs,
             String searchPattern
     ) throws StatusRuntimeException, InterruptedException {
+
         for (int id : delayer) {
             stubs.get(id)
                     .takePhase1(
@@ -131,10 +143,13 @@ public class ClientService extends TupleSpacesReplicaGrpc.TupleSpacesReplicaImpl
     public void takePhaseOneRelease(
             List<TupleSpacesReplicaStub> stubs
     ) throws StatusRuntimeException, InterruptedException {
+
         for (int id : delayer) {
             stubs.get(id)
                     .takePhase1Release(
-                            TakePhase1ReleaseRequest.newBuilder().setClientId(this.ID).build(),
+                            TakePhase1ReleaseRequest.newBuilder()
+                                    .setClientId(this.ID)
+                                    .build(),
                             new ResponseObserver<TakePhase1ReleaseResponse>(takeCollector)
                     );
         }
@@ -147,6 +162,7 @@ public class ClientService extends TupleSpacesReplicaGrpc.TupleSpacesReplicaImpl
             List<TupleSpacesReplicaStub> stubs,
             String selectedTuple
     ) throws StatusRuntimeException, InterruptedException {
+        
         for (int id : delayer) {
             stubs.get(id)
                     .takePhase2(
@@ -164,6 +180,7 @@ public class ClientService extends TupleSpacesReplicaGrpc.TupleSpacesReplicaImpl
 
     public List<String> getTupleSpacesState(String qualifier) throws StatusRuntimeException {
         ManagedChannel channel = nameServerService.getChannel(qualifier);
+        // blocking stub for this operation
         TupleSpacesReplicaBlockingStub stub = connectionManager.resolveBlockingStub(channel);
 
         getTupleSpacesStateResponse response = stub.getTupleSpacesState(

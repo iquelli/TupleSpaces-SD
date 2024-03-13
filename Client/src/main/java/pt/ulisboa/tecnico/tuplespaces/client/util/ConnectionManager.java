@@ -15,28 +15,44 @@ public class ConnectionManager {
         // do nothing
     }
 
+    /*
+     * Resolves a non blocking stub from a certain channel.
+     */
     public TupleSpacesReplicaStub resolveStub(ManagedChannel channel) {
         TupleSpacesReplicaStub stub = TupleSpacesReplicaGrpc.newStub(channel);
         Logger.debug("Connected to server using non-blocking stub");
         return stub;
     }
 
+    /*
+     * Resolves a blocking stub from a certain channel.
+     */
     public TupleSpacesReplicaBlockingStub resolveBlockingStub(ManagedChannel channel) {
         TupleSpacesReplicaBlockingStub stub = TupleSpacesReplicaGrpc.newBlockingStub(channel);
         Logger.debug("Connected to server using blocking stub");
         return stub;
     }
 
+    /*
+     * Closes a channel.
+     */
     public void closeChannel(ManagedChannel channel) {
         channel.shutdown();
     }
 
+
+    /*
+     * Closes a list of channels.
+     */
     public void closeChannels(List<ManagedChannel> channels) {
         for (ManagedChannel channel : channels) {
             closeChannel(channel);
         }
     }
 
+    /*
+     * Resolves non blocking stubs from a list of channels.
+     */
     public List<TupleSpacesReplicaStub> resolveMultipleStubs(List<ManagedChannel> channels) {
         List<TupleSpacesReplicaStub> stubs = new ArrayList<TupleSpacesReplicaStub>();
         for (ManagedChannel channel : channels) {
