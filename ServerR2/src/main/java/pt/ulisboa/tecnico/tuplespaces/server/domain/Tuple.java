@@ -1,5 +1,8 @@
 package pt.ulisboa.tecnico.tuplespaces.server.domain;
 
+/*
+ * Tuple class, used to manage locks.
+ */
 public class Tuple {
 
     private String format;

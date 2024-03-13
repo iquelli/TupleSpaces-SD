@@ -59,6 +59,7 @@ public class ServerMain {
             System.exit(1);
         }
 
+        // try to register the server in the name server
         try {
             nameServerService.register(port, qualifier);
         } catch (StatusRuntimeException e) {
@@ -72,6 +73,7 @@ public class ServerMain {
 
         Logger.info("TupleSpaces server has started%n");
 
+        // create hook for ctrl+c
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             Logger.info("TupleSpaces server is shutting down");
             nameServerService.delete(port);

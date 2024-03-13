@@ -69,6 +69,7 @@ public class ClientService extends TupleSpacesReplicaGrpc.TupleSpacesReplicaImpl
                     );
         }
 
+        // wait for all responses
         putCollector.waitUntilAllReceived(3);
         putCollector.clearResponses();
         connectionManager.closeChannels(channels);
@@ -88,6 +89,7 @@ public class ClientService extends TupleSpacesReplicaGrpc.TupleSpacesReplicaImpl
                     );
         }
 
+        // wait for one response
         readCollector.waitUntilAllReceived(1);
         String tuple = readCollector.getResponse();
 
@@ -136,6 +138,7 @@ public class ClientService extends TupleSpacesReplicaGrpc.TupleSpacesReplicaImpl
                     );
         }
 
+        // wait for all responses
         takeCollector.waitUntilAllReceived(3);
         return takeCollector.getResponses();
     }
@@ -154,6 +157,7 @@ public class ClientService extends TupleSpacesReplicaGrpc.TupleSpacesReplicaImpl
                     );
         }
 
+        // wait for all responses
         takeCollector.waitUntilAllReceived(3);
         takeCollector.clearResponses();
     }
@@ -174,6 +178,7 @@ public class ClientService extends TupleSpacesReplicaGrpc.TupleSpacesReplicaImpl
                     );
         }
 
+        // wait for all responses
         takeCollector.waitUntilAllReceived(3);
         takeCollector.clearResponses();
     }
