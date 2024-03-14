@@ -127,8 +127,7 @@ public class ClientService extends TupleSpacesReplicaGrpc.TupleSpacesReplicaImpl
         }
 
         // Initialize Take phase 2
-        int randomIndex = new Random().nextInt(lockedTuples.size());
-        String selectedTuple = lockedTuples.get(randomIndex);
+        String selectedTuple = lockedTuples.get(0);
         takePhaseTwo(stubs, selectedTuple);
 
         connectionManager.closeChannels(channels);
