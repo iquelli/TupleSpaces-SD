@@ -87,7 +87,7 @@ public class ServerState {
         return tupleFormats;
     }
 
-    public void release(int clientId) throws InvalidClientIDException, InterruptedException {
+    public void release(int clientId) throws InvalidClientIDException {
         if (clientId < 0) {
             throw new InvalidClientIDException(clientId);
         }

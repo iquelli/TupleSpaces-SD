@@ -80,6 +80,7 @@ public class ClientService extends TupleSpacesReplicaGrpc.TupleSpacesReplicaImpl
         List<ManagedChannel> channels = nameServerService.getServersChannels();
         List<TupleSpacesReplicaStub> stubs = connectionManager.resolveMultipleStubs(channels);
 
+        readCollector.clearResponses();
         for (int id : delayer) {
             stubs.get(id)
                     .read(
@@ -92,11 +93,8 @@ public class ClientService extends TupleSpacesReplicaGrpc.TupleSpacesReplicaImpl
 
         // wait for one response
         readCollector.waitUntilAllReceived(1);
-        String tuple = readCollector.getResponse();
-
-        readCollector.clearResponses();
         connectionManager.closeChannels(channels);
-        return tuple;
+        return readCollector.getResponse();
     }
 
     public String take(String searchPattern) throws StatusRuntimeException, InterruptedException {

@@ -141,13 +141,6 @@ public class TupleSpacesReplicaXuLiskovServiceImpl extends TupleSpacesReplicaGrp
             responseObserver.onError(
                     Status.INVALID_ARGUMENT.withDescription(e.getMessage()).asRuntimeException()
             );
-        } catch (InterruptedException e) {
-            Logger.debug("[ERR] TAKE_PHASE_1 operation failed: %s", e.getMessage());
-            responseObserver.onError(
-                    Status.CANCELLED.withDescription(
-                            "Client interrupted while waiting for tuple: " + e.getMessage()
-                    ).asRuntimeException()
-            );
         } catch (RuntimeException e) {
             Logger.debug("[ERR] TAKE_PHASE_1_RELEASE operation failed: %s", e.getMessage());
             responseObserver.onError(
