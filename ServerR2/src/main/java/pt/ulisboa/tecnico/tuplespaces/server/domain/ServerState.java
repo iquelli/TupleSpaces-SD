@@ -99,8 +99,6 @@ public class ServerState {
                     tuple.unlock();
                 }
             }
-            // Wait for new put before triggering new response from the client
-            this.tuples.wait();
         }
     }
 

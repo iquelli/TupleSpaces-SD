@@ -25,6 +25,7 @@ import pt.ulisboa.tecnico.tuplespaces.replicaXuLiskov.contract.TupleSpacesReplic
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class ClientService extends TupleSpacesReplicaGrpc.TupleSpacesReplicaImplBase {
 
@@ -102,6 +103,9 @@ public class ClientService extends TupleSpacesReplicaGrpc.TupleSpacesReplicaImpl
         List<ManagedChannel> channels = nameServerService.getServersChannels();
         List<TupleSpacesReplicaStub> stubs = connectionManager.resolveMultipleStubs(channels);
 
+        Random random = new Random(this.ID);
+        int sleepTime = 0;
+
         List<String> lockedTuples = new ArrayList<>();
         while (true) {
             lockedTuples.addAll(takePhaseOne(stubs, searchPattern));
@@ -112,6 +116,12 @@ public class ClientService extends TupleSpacesReplicaGrpc.TupleSpacesReplicaImpl
 
             // Send release request
             takePhaseOneRelease(stubs);
+            // Sleep for a random amount of time that caps at 60 seconds before sending
+            // a new request
+            if (sleepTime < 60 * 1000) {
+                sleepTime += 5 * 1000;
+            }
+            Thread.sleep(random.nextInt(sleepTime));
         }
 
         // Initialize Take phase 2
