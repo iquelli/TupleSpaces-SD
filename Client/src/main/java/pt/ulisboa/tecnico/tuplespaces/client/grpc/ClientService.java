@@ -108,6 +108,9 @@ public class ClientService extends TupleSpacesReplicaGrpc.TupleSpacesReplicaImpl
         while (true) {
             lockedTuples.addAll(takePhaseOne(stubs, searchPattern));
             takeCollector.clearResponses();
+
+            // Given that we perform the intersection during response collection,
+            // we can simply check this condition to determine if there are locked tuples.
             if (!lockedTuples.isEmpty()) {
                 break; // got a tuple, can exit phase 1
             }
