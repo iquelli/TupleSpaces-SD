@@ -114,6 +114,7 @@ public class ClientService extends TupleSpacesReplicaGrpc.TupleSpacesReplicaImpl
 
             // Send release request
             takePhaseOneRelease(stubs);
+
             // Sleep for a random amount of time that caps at 60 seconds before sending
             // a new request
             if (sleepTime < 60 * 1000) {

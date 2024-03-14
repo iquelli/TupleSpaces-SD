@@ -26,6 +26,7 @@ public class ServerState {
 
         synchronized (this.tuples) {
             this.tuples.add(new Tuple(format));
+
             // We notify that a new tuple format was inserted that could match
             // the pattern.
             this.tuples.notifyAll();
