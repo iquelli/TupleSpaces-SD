@@ -1,14 +1,14 @@
 import sys
-
-sys.path.insert(1, "../Contract/target/generated-sources/protobuf/python")
-
 import logging
 import argparse
 import grpc
-import NameServer_pb2 as pb2
-import NameServer_pb2_grpc as pb2_grpc
 from NameServerServiceImpl import NameServerServiceImpl
 from concurrent import futures
+
+sys.path.insert(1, "../Contract/target/generated-sources/protobuf/python")
+
+import NameServer_pb2 as pb2
+import NameServer_pb2_grpc as pb2_grpc
 
 # Define the port
 PORT = 5001
