@@ -168,6 +168,7 @@ public class CommandProcessor {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
+        System.out.println("OK");
     }
 
     private void setdelay(String[] split) {
@@ -192,7 +193,7 @@ public class CommandProcessor {
 
         // register delay <time> for when calling server <qualifier>
         this.clientService.setDelay(qualifier, time);
-        System.out.println("");
+        System.out.println("OK");
     }
 
     private void printUsage() {
