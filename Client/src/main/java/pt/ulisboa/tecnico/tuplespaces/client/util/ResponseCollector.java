@@ -5,8 +5,8 @@ import java.util.List;
 
 public class ResponseCollector {
 
-    List<String> responses;
-    int nResponses;
+    private List<String> responses;
+    private int nResponses;
 
     public ResponseCollector() {
         responses = new ArrayList<String>();
@@ -19,14 +19,12 @@ public class ResponseCollector {
         notifyAll();
     }
 
-    synchronized public void addAllResponses(List<String> responses) {
-        this.responses.addAll(responses);
-        ++nResponses;
-        notifyAll();
-    }
-
     synchronized public void intersectResponses(List<String> responses) {
-        this.responses.retainAll(responses);
+        if (this.isEmpty() && nResponses == 0) {
+            this.responses.addAll(responses);
+        } else {
+            this.responses.retainAll(responses);
+        }
         ++nResponses;
         notifyAll();
     }

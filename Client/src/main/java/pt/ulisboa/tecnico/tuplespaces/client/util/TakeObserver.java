@@ -15,11 +15,7 @@ public class TakeObserver extends ResponseObserver<TakePhase1Response> {
     public void onNext(TakePhase1Response takeResponse) {
         List<String> tuples = takeResponse.getReservedTuplesList();
 
-        if (collector.isEmpty()) {
-            collector.addAllResponses(tuples);
-        } else {
-            collector.intersectResponses(tuples);
-        }
+        collector.intersectResponses(tuples);
         Logger.debug("Received response from take phase 1 request");
     }
 
