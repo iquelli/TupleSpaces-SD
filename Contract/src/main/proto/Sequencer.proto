@@ -1,7 +1,8 @@
 syntax = "proto3";
 package pt.ulisboa.tecnico.sequencer.contract;
 
-message GetSeqNumberRequest {}
+message GetSeqNumberRequest {
+}
 message GetSeqNumberResponse {
   int32 seqNumber = 1;
 }
