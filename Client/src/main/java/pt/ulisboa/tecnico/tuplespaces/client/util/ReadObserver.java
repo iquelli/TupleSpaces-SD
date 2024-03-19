@@ -1,7 +1,7 @@
 package pt.ulisboa.tecnico.tuplespaces.client.util;
 
 import pt.ulisboa.tecnico.tuplespaces.common.Logger;
-import pt.ulisboa.tecnico.tuplespaces.replicaXuLiskov.contract.TupleSpacesReplicaXuLiskov.ReadResponse;
+import pt.ulisboa.tecnico.tuplespaces.replicaTotalOrder.contract.TupleSpacesReplicaTotalOrder.ReadResponse;
 
 public class ReadObserver extends ResponseObserver<ReadResponse> {
 

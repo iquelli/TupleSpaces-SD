@@ -52,14 +52,14 @@ public class ServerMain {
         Server server = ServerBuilder.forPort(port).addService(impl).build();
 
         try {
-            // Server threads are running in the background.
+            // Server threads are running in the background
             server.start();
         } catch (Exception e) {
             Logger.error("Failed to start server to listen on port %s", args[0]);
             System.exit(1);
         }
 
-        // try to register the server in the name server
+        // Try to register the server in the name server
         try {
             nameServerService.register(port, qualifier);
         } catch (StatusRuntimeException e) {
@@ -80,7 +80,7 @@ public class ServerMain {
             nameServerService.close();
         }));
 
-        // Do not exit the main thread. Wait until server is terminated.
+        // Do not exit the main thread. Wait until server is terminated
         server.awaitTermination();
     }
 

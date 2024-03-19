@@ -1,21 +1,17 @@
 package pt.ulisboa.tecnico.tuplespaces.client.util;
 
 import pt.ulisboa.tecnico.tuplespaces.common.Logger;
-import pt.ulisboa.tecnico.tuplespaces.replicaXuLiskov.contract.TupleSpacesReplicaXuLiskov.TakePhase1Response;
+import pt.ulisboa.tecnico.tuplespaces.replicaTotalOrder.contract.TupleSpacesReplicaTotalOrder.TakeResponse;
 
-import java.util.List;
-
-public class TakeObserver extends ResponseObserver<TakePhase1Response> {
+public class TakeObserver extends ResponseObserver<TakeResponse> {
 
     public TakeObserver(ResponseCollector collector) {
         super(collector);
     }
 
     @Override
-    public void onNext(TakePhase1Response takeResponse) {
-        List<String> tuples = takeResponse.getReservedTuplesList();
-
-        collector.intersectResponses(tuples);
+    public void onNext(TakeResponse takeResponse) {
+        collector.addResponse(takeResponse.getResult());
         Logger.debug("Received response from take phase 1 request");
     }
 

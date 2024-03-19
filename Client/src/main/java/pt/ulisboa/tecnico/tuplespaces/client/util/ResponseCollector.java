@@ -19,16 +19,6 @@ public class ResponseCollector {
         notifyAll();
     }
 
-    synchronized public void intersectResponses(List<String> responses) {
-        if (this.isEmpty() && nResponses == 0) {
-            this.responses.addAll(responses);
-        } else {
-            this.responses.retainAll(responses);
-        }
-        ++nResponses;
-        notifyAll();
-    }
-
     synchronized public String getResponse() {
         if (this.isEmpty()) {
             return "";

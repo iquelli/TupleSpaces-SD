@@ -180,6 +180,7 @@
                         <goals>
                             <goal>exec</goal>
                         </goals>
+                        <phase>install</phase>
                     </execution>
                 </executions>
             </plugin>

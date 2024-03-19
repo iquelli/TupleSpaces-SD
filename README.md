@@ -49,12 +49,6 @@ To compile and install all modules:
 mvn clean install
 ```
 
-After that, go to the `Contract` folder and run the following command:
-
-```s
-mvn exec:exec
-```
-
 ### Running
 
 To run the server, the following command can be performed in the respective server folder:
@@ -66,13 +60,19 @@ mvn exec:java -Dexec.args="<port> <qualifier>"
 To run the client, the following command can be performed in the respective client folder:
 
 ```s
-mvn exec:java < -Dexec.args="<client id>" >
+mvn exec:java
 ```
 
 To run the name server, the following command can be performed in the respective name server folder:
 
 ```s
 python server.py
+```
+
+To run the sequencer, the following command can be performed in the respective sequencer folder:
+
+```s
+mvn exec:java -Dexec.args="<port>"
 ```
 
 #### Running in Debug Mode

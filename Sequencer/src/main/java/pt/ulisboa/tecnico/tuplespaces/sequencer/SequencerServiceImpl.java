@@ -5,7 +5,6 @@ import pt.ulisboa.tecnico.sequencer.contract.SequencerGrpc.SequencerImplBase;
 import pt.ulisboa.tecnico.sequencer.contract.SequencerOuterClass.GetSeqNumberRequest;
 import pt.ulisboa.tecnico.sequencer.contract.SequencerOuterClass.GetSeqNumberResponse;
 
-
 public class SequencerServiceImpl extends SequencerImplBase {
 
     int seqNumber;
