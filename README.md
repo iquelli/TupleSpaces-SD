@@ -72,7 +72,7 @@ python server.py
 To run the sequencer, the following command can be performed in the respective sequencer folder:
 
 ```s
-mvn exec:java -Dexec.args="<port>"
+mvn exec:java
 ```
 
 #### Running in Debug Mode

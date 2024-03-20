@@ -9,7 +9,6 @@ import pt.ulisboa.tecnico.sequencer.contract.SequencerOuterClass.GetSeqNumberRes
 public class SequencerService {
 
     private static final String SEQUENCER_SERVER_HOST = "localhost";
-    // TODO: this is a well known port, but the sequencer receives it from the terminal
     private static final int SEQUENCER_SERVER_PORT = 8080;
 
     private final ManagedChannel channel;

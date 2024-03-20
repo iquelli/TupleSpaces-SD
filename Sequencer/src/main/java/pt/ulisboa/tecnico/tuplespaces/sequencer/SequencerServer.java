@@ -8,7 +8,7 @@ import pt.ulisboa.tecnico.tuplespaces.common.Logger;
 public class SequencerServer {
 
     /** Server host port **/
-    private static int port;
+    private static int PORT = 8080;
 
     public static void main(String[] args) throws Exception {
         Logger.debug(SequencerServer.class.getSimpleName() + " started");
@@ -20,17 +20,16 @@ public class SequencerServer {
         }
 
         // Check arguments
-        if (args.length < 1) {
-            Logger.error("Argument(s) missing!");
-            Logger.error("Usage: mvn exec:java -Dexec.args=\"<port>\"");
+        if (args.length != 0) {
+            Logger.error("Too many arguments!");
+            Logger.error("Usage: mvn exec:java");
             System.exit(1);
         }
 
-        port = Integer.valueOf(args[0]);
         final BindableService impl = new SequencerServiceImpl();
 
         // Create a new server to listen on port
-        Server server = ServerBuilder.forPort(port).addService(impl).build();
+        Server server = ServerBuilder.forPort(PORT).addService(impl).build();
         // Start the server
         server.start();
         // Server threads are running in the background
