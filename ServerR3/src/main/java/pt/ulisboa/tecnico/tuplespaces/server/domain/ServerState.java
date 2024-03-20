@@ -11,19 +11,18 @@ public class ServerState {
     private static final String BGN_TUPLE = "<";
     private static final String END_TUPLE = ">";
 
-    // TODO: probably dont need the Tuple class anymore, so remove it
-    private List<Tuple> tuples;
+    private List<String> tuples;
 
     public ServerState() {
-        this.tuples = new ArrayList<Tuple>();
+        this.tuples = new ArrayList<String>();
     }
 
-    public void put(String format) throws InvalidTupleException {
-        // TODO: implement put state
-        // if (!checkFormat(format)) {
-        //     throw new InvalidTupleException(format);
-        // }
+    public void put(String format) throws InvalidTupleException, InterruptedException {
+        if (!checkFormat(format)) {
+            throw new InvalidTupleException(format);
+        }
 
+        // TODO: implement put state
         // synchronized (this.tuples) {
         //     this.tuples.add(new Tuple(format));
 
@@ -34,10 +33,9 @@ public class ServerState {
     }
 
     private String getMatchingTuple(String pattern) {
-        for (Tuple tuple : this.tuples) {
-            String format = tuple.getFormat();
-            if (format.matches(pattern)) {
-                return format;
+        for (String tuple : this.tuples) {
+            if (tuple.matches(pattern)) {
+                return tuple;
             }
         }
         return null;
@@ -60,13 +58,17 @@ public class ServerState {
         return tuple;
     }
 
-    public String take(String pattern) {
+    public String take(String pattern) throws InvalidTupleException, InterruptedException {
+        if (!checkFormat(pattern)) {
+            throw new InvalidTupleException(pattern);
+        }
+
         // TODO: implement take state
         return null;
     }
 
     public List<String> getTupleSpacesState() {
-        return this.tuples.stream().map(tuple -> tuple.getFormat()).toList();
+        return this.tuples;
     }
 
     private boolean checkFormat(String input) {

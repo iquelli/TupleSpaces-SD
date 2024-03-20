@@ -31,25 +31,29 @@ public class TupleSpacesReplicaTotalOrderServiceImpl extends TupleSpacesReplicaG
 
     @Override
     public void put(PutRequest request, StreamObserver<PutResponse> responseObserver) {
-        // TODO: implement put service
-        // try {
-        //     Logger.debug("[INFO] Received PUT request:%n%s", request);
-        //     state.put(request.getNewTuple());
+        try {
+            Logger.debug("[INFO] Received PUT request:%n%s", request);
+            state.put(request.getNewTuple());
 
-        //     // Use responseObserver to send a single response back
-        //     responseObserver.onNext(PutResponse.getDefaultInstance());
-        //     responseObserver.onCompleted();
-        // } catch (InvalidTupleException e) {
-        //     Logger.debug("[ERR] PUT operation failed: %s", e.getMessage());
-        //     responseObserver.onError(
-        //             Status.INVALID_ARGUMENT.withDescription(e.getMessage()).asRuntimeException()
-        //     );
-        // } catch (RuntimeException e) {
-        //     Logger.debug("[ERR] PUT operation failed: %s", e.getMessage());
-        //     responseObserver.onError(
-        //             Status.UNKNOWN.withDescription(e.getMessage()).asRuntimeException()
-        //     );
-        // }
+            // Use responseObserver to send a single response back
+            responseObserver.onNext(PutResponse.getDefaultInstance());
+            responseObserver.onCompleted();
+        } catch (InvalidTupleException e) {
+            Logger.debug("[ERR] PUT operation failed: %s", e.getMessage());
+            responseObserver.onError(
+                    Status.INVALID_ARGUMENT.withDescription(e.getMessage()).asRuntimeException()
+            );
+        } catch (InterruptedException e) {
+            Logger.debug("[ERR] PUT operation failed: %s", e.getMessage());
+            responseObserver.onError(
+                    Status.CANCELLED.withDescription(e.getMessage()).asRuntimeException()
+            );
+        } catch (RuntimeException e) {
+            Logger.debug("[ERR] PUT operation failed: %s", e.getMessage());
+            responseObserver.onError(
+                    Status.UNKNOWN.withDescription(e.getMessage()).asRuntimeException()
+            );
+        }
     }
 
     @Override
@@ -72,9 +76,7 @@ public class TupleSpacesReplicaTotalOrderServiceImpl extends TupleSpacesReplicaG
         } catch (InterruptedException e) {
             Logger.debug("[ERR] READ operation failed: %s", e.getMessage());
             responseObserver.onError(
-                    Status.CANCELLED.withDescription(
-                            "Client interrupted while waiting for tuple: " + e.getMessage()
-                    ).asRuntimeException()
+                    Status.CANCELLED.withDescription(e.getMessage()).asRuntimeException()
             );
         } catch (RuntimeException e) {
             Logger.debug("[ERR] READ operation failed: %s", e.getMessage());
@@ -86,35 +88,32 @@ public class TupleSpacesReplicaTotalOrderServiceImpl extends TupleSpacesReplicaG
 
     @Override
     public void take(TakeRequest request, StreamObserver<TakeResponse> responseObserver) {
-        // TODO: implement take service
-        // try {
-        //     Logger.debug("[INFO] Received TAKE_PHASE_1 request:%n%s", request);
-        //     List<String> tuples = state.lock(request.getSearchPattern(), request.getClientId());
+        try {
+            Logger.debug("[INFO] Received TAKE request:%n%s", request);
+            String tuple = state.take(request.getSearchPattern());
 
-        //     // Builder to construct a new Protobuffer object
-        //     TakePhase1Response response = TakePhase1Response.newBuilder()
-        //             .addAllReservedTuples(tuples)
-        //             .build();
+            // Builder to construct a new Protobuffer object
+            TakeResponse response = TakeResponse.newBuilder().setResult(tuple).build();
 
-        //     // Use responseObserver to send a single response back
-        //     responseObserver.onNext(response);
-        //     responseObserver.onCompleted();
-        // } catch (InvalidClientIDException e) {
-        //     Logger.debug("[ERR] TAKE_PHASE_1 operation failed: %s", e.getMessage());
-        //     responseObserver.onError(
-        //             Status.INVALID_ARGUMENT.withDescription(e.getMessage()).asRuntimeException()
-        //     );
-        // } catch (InvalidTupleException e) {
-        //     Logger.debug("[ERR] TAKE_PHASE_1 operation failed: %s", e.getMessage());
-        //     responseObserver.onError(
-        //             Status.INVALID_ARGUMENT.withDescription(e.getMessage()).asRuntimeException()
-        //     );
-        // } catch (RuntimeException e) {
-        //     Logger.debug("[ERR] TAKE_PHASE_1 operation failed: %s", e.getMessage());
-        //     responseObserver.onError(
-        //             Status.UNKNOWN.withDescription(e.getMessage()).asRuntimeException()
-        //     );
-        // }
+            // Use responseObserver to send a single response back
+            responseObserver.onNext(response);
+            responseObserver.onCompleted();
+        } catch (InvalidTupleException e) {
+            Logger.debug("[ERR] TAKE operation failed: %s", e.getMessage());
+            responseObserver.onError(
+                    Status.INVALID_ARGUMENT.withDescription(e.getMessage()).asRuntimeException()
+            );
+        } catch (InterruptedException e) {
+            Logger.debug("[ERR] TAKE operation failed: %s", e.getMessage());
+            responseObserver.onError(
+                    Status.CANCELLED.withDescription(e.getMessage()).asRuntimeException()
+            );
+        } catch (RuntimeException e) {
+            Logger.debug("[ERR] TAKE operation failed: %s", e.getMessage());
+            responseObserver.onError(
+                    Status.UNKNOWN.withDescription(e.getMessage()).asRuntimeException()
+            );
+        }
     }
 
     @Override

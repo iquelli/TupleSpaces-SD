@@ -24,19 +24,19 @@ public class ClientMain {
             System.exit(1);
         }
 
-        final NameServerService nameServerService = new NameServerService();
+        final NameServerService nameServer = new NameServerService();
 
         // create hook for ctrl+c
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            nameServerService.close();
+            nameServer.close();
         }));
 
         // start up client
         CommandProcessor parser = new CommandProcessor(
-                new ClientService(nameServerService, ClientMain.numServers)
+                new ClientService(nameServer, ClientMain.numServers)
         );
         parser.parseInput();
-        nameServerService.close();
+        nameServer.close();
     }
 
 }
