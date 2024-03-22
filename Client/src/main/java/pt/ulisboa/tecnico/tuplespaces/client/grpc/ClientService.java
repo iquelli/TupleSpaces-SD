@@ -111,9 +111,10 @@ public class ClientService {
 
         // wait for all responses
         takeCollector.waitUntilAllReceived(3);
+        String tuple = takeCollector.getResponse();
         takeCollector.clearResponses();
         connectionManager.closeChannels(channels);
-        return takeCollector.getResponse();
+        return tuple;
     }
 
     public List<String> getTupleSpacesState(String qualifier) throws StatusRuntimeException {

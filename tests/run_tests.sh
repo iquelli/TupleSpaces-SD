@@ -2,8 +2,9 @@
 
 ROOT_PATH=${PWD}/../
 CLIENT_PATH=${PWD}/../Client
-SERVER_PATH=${PWD}/../ServerR2
+SERVER_PATH=${PWD}/../ServerR3
 NAME_SERVER_PATH=${PWD}/../NameServer
+SEQUENCER_PATH=${PWD}/../Sequencer
 TESTS_FOLDER=${PWD}
 TESTS_OUT_EXPECTED=${TESTS_FOLDER}/expected
 TESTS_OUTPUT=${TESTS_FOLDER}/test-outputs
@@ -22,8 +23,9 @@ mkdir -p $TESTS_OUTPUT
 
 cd $ROOT_PATH
 mvn clean install -q
-cd Contract
-mvn exec:exec -q
+
+cd $SEQUENCER_PATH
+mvn exec:java -q > /dev/null &
 
 cd $NAME_SERVER_PATH
 python server.py > /dev/null &

@@ -33,7 +33,7 @@ public class TupleSpacesReplicaTotalOrderServiceImpl extends TupleSpacesReplicaG
     public void put(PutRequest request, StreamObserver<PutResponse> responseObserver) {
         try {
             Logger.debug("[INFO] Received PUT request:%n%s", request);
-            state.put(request.getNewTuple());
+            state.put(request.getNewTuple(), request.getSeqNumber());
 
             // Use responseObserver to send a single response back
             responseObserver.onNext(PutResponse.getDefaultInstance());
@@ -90,7 +90,7 @@ public class TupleSpacesReplicaTotalOrderServiceImpl extends TupleSpacesReplicaG
     public void take(TakeRequest request, StreamObserver<TakeResponse> responseObserver) {
         try {
             Logger.debug("[INFO] Received TAKE request:%n%s", request);
-            String tuple = state.take(request.getSearchPattern());
+            String tuple = state.take(request.getSearchPattern(), request.getSeqNumber());
 
             // Builder to construct a new Protobuffer object
             TakeResponse response = TakeResponse.newBuilder().setResult(tuple).build();

@@ -148,3 +148,4 @@ buildNumber.properties
 /NameServer/__pycache__/
 /.venv/
 tests/test-outputs/
+tests/out*

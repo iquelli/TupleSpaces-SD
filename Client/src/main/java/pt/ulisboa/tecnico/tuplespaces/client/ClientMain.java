@@ -37,6 +37,7 @@ public class ClientMain {
         );
         parser.parseInput();
         nameServer.close();
+        System.exit(0);
     }
 
 }
