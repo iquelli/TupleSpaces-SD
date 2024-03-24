@@ -22,10 +22,12 @@ code dependency management, to ensure your code runs using the correct component
 
 ## Getting Started
 
-The overall system is made up of several modules. The different types of servers are located in _ServerX_ (where X denotes stage 1, 2 or 3).
-The clients is in _Client_.
-The definition of messages and services is in _Contract_. The future name server
-is in _NameServer_.
+The overall system is made up of several modules.
+The different types of servers are located in _ServerRX_ (where X denotes stage 1, 2 or 3).
+The client is in _Client_.
+The definition of messages and services is in _Contract_.
+The name server is in _NameServer_.
+The sequencer is in _Sequencer_.
 
 See the [Project Statement](https://github.com/tecnico-distsys/TupleSpaces) for a complete domain and system description.
 
