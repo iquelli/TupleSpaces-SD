@@ -10,6 +10,7 @@ public final class Logger {
     );
 
     private Logger() {
+        // do nothing
     }
 
     public static void setDebugFlag(boolean flag) {
