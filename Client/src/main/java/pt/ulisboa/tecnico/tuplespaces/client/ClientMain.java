@@ -1,6 +1,7 @@
 package pt.ulisboa.tecnico.tuplespaces.client;
 
 import pt.ulisboa.tecnico.tuplespaces.client.grpc.ClientService;
+import pt.ulisboa.tecnico.tuplespaces.client.grpc.SequencerService;
 import pt.ulisboa.tecnico.tuplespaces.common.Logger;
 import pt.ulisboa.tecnico.tuplespaces.common.grpc.NameServerService;
 
@@ -25,18 +26,21 @@ public class ClientMain {
         }
 
         final NameServerService nameServer = new NameServerService();
+        final SequencerService sequencer = new SequencerService();
 
         // create hook for ctrl+c
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             nameServer.close();
+            sequencer.close();
         }));
 
         // start up client
         CommandProcessor parser = new CommandProcessor(
-                new ClientService(nameServer, ClientMain.numServers)
+                new ClientService(nameServer, sequencer, ClientMain.numServers)
         );
         parser.parseInput();
         nameServer.close();
+        sequencer.close();
         System.exit(0);
     }
 

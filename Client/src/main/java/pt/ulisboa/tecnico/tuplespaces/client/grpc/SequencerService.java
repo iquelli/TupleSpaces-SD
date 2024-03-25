@@ -6,7 +6,7 @@ import pt.ulisboa.tecnico.sequencer.contract.SequencerGrpc;
 import pt.ulisboa.tecnico.sequencer.contract.SequencerOuterClass.GetSeqNumberRequest;
 import pt.ulisboa.tecnico.sequencer.contract.SequencerOuterClass.GetSeqNumberResponse;
 
-public class SequencerService {
+public class SequencerService implements AutoCloseable {
 
     private static final String SEQUENCER_SERVER_HOST = "localhost";
     private static final int SEQUENCER_SERVER_PORT = 8080;
@@ -24,6 +24,11 @@ public class SequencerService {
     public int getSeqNumber() {
         GetSeqNumberResponse response = stub.getSeqNumber(GetSeqNumberRequest.newBuilder().build());
         return response.getSeqNumber();
+    }
+
+    @Override
+    public void close() {
+        channel.shutdown();
     }
 
 }

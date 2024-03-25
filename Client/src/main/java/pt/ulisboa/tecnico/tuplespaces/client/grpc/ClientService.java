@@ -30,11 +30,11 @@ public class ClientService {
     private ResponseCollector readCollector;
     private ResponseCollector takeCollector;
 
-    public ClientService(NameServerService nameServer, int numServers) {
+    public ClientService(NameServerService nameServer, SequencerService sequencer, int numServers) {
         this.nameServer = nameServer;
 
         // Obtains new sequence numbers for put and take requests
-        this.sequencer = new SequencerService();
+        this.sequencer = sequencer;
 
         // Creates stubs, closes channels
         this.connectionManager = new ConnectionManager();
