@@ -12,7 +12,7 @@ public class TakeObserver extends ResponseObserver<TakeResponse> {
     @Override
     public void onNext(TakeResponse takeResponse) {
         collector.addResponse(takeResponse.getResult());
-        Logger.debug("Received response from take phase 1 request");
+        Logger.debug("Received response from take request");
     }
 
 }

@@ -73,15 +73,20 @@ public class ServerMain {
 
         Logger.info("TupleSpaces server has started%n");
 
-        // create hook for ctrl+c
+        // Create hook for ctrl+c
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             Logger.info("TupleSpaces server is shutting down");
             nameServerService.delete(port);
             nameServerService.close();
         }));
 
-        // Do not exit the main thread. Wait until server is terminated
+        // Do not exit the main thread
+        // Wait until server is terminated
         server.awaitTermination();
+
+        // Server is terminated
+        Logger.info("TupleSpaces server has stopped");
+        server.shutdown();
     }
 
     /**

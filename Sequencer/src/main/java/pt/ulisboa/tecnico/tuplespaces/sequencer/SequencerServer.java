@@ -14,9 +14,9 @@ public class SequencerServer {
         Logger.debug(SequencerServer.class.getSimpleName() + " started");
 
         // Print received arguments
-        Logger.debug("Received %d arguments%n", args.length);
+        Logger.debug("Received %d arguments", args.length);
         for (int i = 0; i < args.length; i++) {
-            Logger.debug("arg[%d] = %s%n", i, args[i]);
+            Logger.debug("arg[%d] = %s", i, args[i]);
         }
 
         // Check arguments
@@ -33,14 +33,19 @@ public class SequencerServer {
         // Start the server
         server.start();
         // Server threads are running in the background
-        Logger.info("Sequencer server started");
+        Logger.info("Sequencer server started%n");
+
+        // Create hook for ctrl+c
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            Logger.info("Sequencer server is shutting down");
+        }));
 
         // Do not exit the main thread
         // Wait until server is terminated
         server.awaitTermination();
 
         // Server is terminated
-        Logger.info("Sequencer server stopped");
+        Logger.info("Sequencer server has stopped");
         server.shutdown();
     }
 

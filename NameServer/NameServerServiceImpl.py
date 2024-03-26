@@ -45,6 +45,8 @@ class NameServerServiceImpl(pb2_grpc.NameServerServicer):
             logging.info("Receiving lookup request:\n" + str(request))
             service_name = request.serviceName
             qualifier = request.qualifier
+            if not validate_qualifier(qualifier):
+                raise InvalidServerArgumentsException
 
             servers = []
             if service_name in self.server.service_map:
