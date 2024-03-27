@@ -152,6 +152,7 @@ public class ServerState {
         }
 
         // The take inserts itself in the waiting queue and then blocks
+        notifyAll();
         this.waitingQueue.put(seqNumber, pattern);
         while (seqNumber != this.canTake) {
             wait();
