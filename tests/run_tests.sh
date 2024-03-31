@@ -1,6 +1,9 @@
 #!/bin/bash
 
+ROOT_PATH=${PWD}/../
 CLIENT_PATH=${PWD}/../Client
+SERVER_PATH=${PWD}/../ServerR1
+NAME_SERVER_PATH=${PWD}/../NameServer
 TESTS_FOLDER=${PWD}
 TESTS_OUT_EXPECTED=${TESTS_FOLDER}/expected
 TESTS_OUTPUT=${TESTS_FOLDER}/test-outputs
@@ -17,6 +20,15 @@ fi
 
 rm -rf $TESTS_OUTPUT
 mkdir -p $TESTS_OUTPUT
+
+cd $ROOT_PATH
+mvn clean install -q
+
+cd $NAME_SERVER_PATH
+python server.py > /dev/null &
+
+cd $SERVER_PATH
+mvn exec:java -q -Dexec.args="2001 A" > /dev/null &
 
 cd $CLIENT_PATH
 for i in {1..5}; do

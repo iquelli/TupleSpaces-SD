@@ -49,12 +49,6 @@ To compile and install all modules:
 mvn clean install
 ```
 
-After that, go to the `Contract` folder and run the following command:
-
-```s
-mvn exec:exec
-```
-
 ### Running
 
 To run the server, the following command can be performed in the respective server folder:
