@@ -22,8 +22,6 @@ mkdir -p $TESTS_OUTPUT
 
 cd $ROOT_PATH
 mvn clean install -q
-cd Contract
-mvn exec:exec -q
 
 cd $NAME_SERVER_PATH
 python server.py > /dev/null &

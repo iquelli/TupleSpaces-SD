@@ -16,7 +16,6 @@
         <module>Contract</module>
         <module>Common</module>
         <module>Client</module>
-        <module>ServerR1</module>
         <module>ServerR2</module>
 
         <!-- This should only be used in phase 3
