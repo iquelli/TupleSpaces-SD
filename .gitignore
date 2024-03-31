@@ -141,8 +141,6 @@ buildNumber.properties
 /Client/.settings/
 /Common/.settings/
 /Contract/.settings/
-/ServerR1/.settings/
-/ServerR2/.settings/
 /ServerR3/.settings/
 /NameServer/NameServer.iml
 /NameServer/__pycache__/

@@ -28,7 +28,7 @@ public class ClientMain {
         final NameServerService nameServer = new NameServerService();
         final SequencerService sequencer = new SequencerService();
 
-        // create hook for ctrl+c
+        // Create hook for ctrl+c
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             nameServer.close();
             sequencer.close();
