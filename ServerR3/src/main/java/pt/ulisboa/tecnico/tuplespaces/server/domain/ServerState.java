@@ -173,7 +173,7 @@ public class ServerState {
      * @return The global tuple list that represents the TupleSpace.
      **/
     public synchronized List<String> getTupleSpacesState() {
-        return this.tuples;
+        return new ArrayList<String>(this.tuples);
     }
 
     /**
