@@ -137,7 +137,9 @@ public class ServerState {
     }
 
     public List<String> getTupleSpacesState() {
-        return this.tuples.stream().map(tuple -> tuple.getFormat()).toList();
+        synchronized (this.tuples) {
+            return this.tuples.stream().map(tuple -> tuple.getFormat()).toList();
+        }
     }
 
     private boolean checkFormat(String input) {
