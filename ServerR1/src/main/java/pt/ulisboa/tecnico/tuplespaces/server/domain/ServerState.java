@@ -70,7 +70,9 @@ public class ServerState {
     }
 
     public List<String> getTupleSpacesState() {
-        return tuples;
+        synchronized (tuples) {
+            return new ArrayList<String>(tuples);
+        }
     }
 
     private boolean checkInput(String input) {

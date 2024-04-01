@@ -34,7 +34,7 @@ cd $CLIENT_PATH
 for i in {1..5}; do
     echo "-------------------------------------------------------------------------------"
     TEST=$(printf "%02d" $i)
-    mvn compile exec:java -q < ${TESTS_FOLDER}/input$TEST.txt > ${TESTS_OUTPUT}/out$TEST.txt
+    time mvn compile exec:java -q < ${TESTS_FOLDER}/input$TEST.txt > ${TESTS_OUTPUT}/out$TEST.txt
 
     OUTPUT=$(${DIFF} ${TESTS_OUTPUT}/out$TEST.txt ${TESTS_OUT_EXPECTED}/out$TEST.txt)
     if [ "$OUTPUT" != "" ]; then
@@ -45,3 +45,6 @@ for i in {1..5}; do
         echo "${GREEN}TEST [$TEST] PASSED${NC}"
     fi
 done
+
+killall java
+killall python
