@@ -29,7 +29,7 @@ The definition of messages and services is in _Contract_.
 The name server is in _NameServer_.
 The sequencer is in _Sequencer_.
 
-See the [Project Statement](https://github.com/tecnico-distsys/TupleSpaces) for a complete domain and system description.
+See the [Project Statement](statement.md) for a complete domain and system description.
 
 ### Prerequisites
 
